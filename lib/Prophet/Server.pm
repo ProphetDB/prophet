@@ -174,9 +174,14 @@ sub app_static_root {
 # welcome.
 sub system_js_and_css {
     my $mapping = {
-        'yui/css/reset.css' => '/usr/share/javascript/yui/reset/reset.css',
+        'yui/css/reset.css' =>
+          '/usr/share/javascript/yui3/cssreset/reset-min.css',
         'jquery/js/jquery-1.2.6.min.js',
         => '/usr/share/javascript/jquery/jquery.min.js',
+        'jquery/js/jquery.tablesorter.min.js',
+        => '/usr/share/javascript/jquery-tablesorter/jquery.tablesorter.min.js',
+        'jquery/css/tablesorter/style.css',
+        => '/usr/share/javascript/jquery-tablesorter/themes/blue/style.css',
     };
     return $mapping;
 }
