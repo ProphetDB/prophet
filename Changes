@@ -1,3 +1,7 @@
+0.751 2013-05-19
+ * Nothing really user visible. Using Dist::Zilla, and Prophet::Devel for
+   buildingthe dist. [Ioan Rogers]
+
 0.750 2011-07-06
  * --progress option to publish command enables rsync's publish flag [Lance Wicks]
  * PROPHET_EDITOR variable allows customization of editor [Rob Hoelz]

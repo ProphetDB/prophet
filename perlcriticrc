@@ -1,4 +1,3 @@
-severity = stern
 color = 1
 
 [ValuesAndExpressions::RequireNumberSeparators]
@@ -29,3 +28,14 @@ allow = if
 
 # I prefer version strings and don't care about old perls
 [-ValuesAndExpressions::ProhibitVersionStrings]
+
+[RegularExpressions::RequireExtendedFormatting]
+minimum_regex_length_to_complain_about = 12
+
+# doesn't know about Moo builders, etc
+[-Subroutines::ProhibitUnusedPrivateSubroutines]
+
+# don't care for these
+[-RegularExpressions::RequireLineBoundaryMatching]
+[-RegularExpressions::RequireDotMatchAnything]
+[-Variables::ProhibitPunctuationVars]
