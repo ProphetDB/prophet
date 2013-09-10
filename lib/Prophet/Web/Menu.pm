@@ -232,7 +232,7 @@ sub render_as_menubar {
     $buffer .=
       $self->_render_as_menu_item( class => "page-nav sf-menu", id => $id );
 
-    $buffer .= q|<script type="text/javascript"> 
+    $buffer .= q|<script type="text/javascript">
                     $(document).ready(function(){ $("ul.page-nav").superfish(); });
                 </script>|;
     return $buffer;
@@ -303,7 +303,7 @@ sub as_link {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
+__PACKAGE__->meta->make_immutable(inline_constructor => 0);
 no Any::Moose;
 
 1;
