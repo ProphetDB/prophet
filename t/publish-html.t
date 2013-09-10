@@ -1,9 +1,17 @@
 #!/usr/bin/perl
 use warnings;
 use strict;
-use Prophet::Test tests => 13;
+use Prophet::Test;
 use File::Temp 'tempdir';
 use File::Spec;
+
+eval { require Template::Declare };
+print ref $@;
+if ($@) {
+    plan skip_all => 'Template::Declare is not installed';
+} else {
+    plan tests => 13;
+}
 
 my ( $bug_uuid, $pullall_uuid );
 

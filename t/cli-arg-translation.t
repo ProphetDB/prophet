@@ -29,10 +29,18 @@ is( $command->has_arg('all'), 1, 'translation of -a to --all correct' );
 is( $command->has_arg('verbose'), 1,
     'translation of -v to --verbose correct' );
 
-use_ok('Prophet::CLI::Command::Server');
-$context->set_arg( p => '8080' );
-my $server =
-  Prophet::CLI::Command::Server->new( handle => $cxn, context => $context );
-diag('Checking a subclass arg translation (with value)');
-is( $server->context->arg('port'),
-    '8080', 'translation of -p to --port correct' );
+SKIP: {
+    eval { require HTTP::Server::Simple::CGI };
+    skip "HTTP::Server::Simple::CGI not installed", 2 if $@;
+
+    eval { require Template::Declare };
+    skip "Template::Declare is not installed", 2 if $@;
+
+    use_ok('Prophet::CLI::Command::Server');
+    $context->set_arg( p => '8080' );
+    my $server =
+        Prophet::CLI::Command::Server->new( handle => $cxn, context => $context );
+    diag('Checking a subclass arg translation (with value)');
+    is( $server->context->arg('port'),
+        '8080', 'translation of -p to --port correct' );
+}
