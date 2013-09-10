@@ -72,7 +72,7 @@ sub make_template {
       : $self->app_handle->config->aliases;
 
     if (%$aliases) {
-        for my $key ( keys %$aliases ) {
+        for my $key ( sort keys %$aliases ) {
             $content .= "$key = $aliases->{$key}\n";
         }
     } elsif ( !$self->has_arg('edit') ) {

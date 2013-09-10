@@ -94,8 +94,8 @@ Prophet::Test::set_editor(
 
 $out = run_command( 'settings', 'edit' );
 like(
-    $out, qr/^An error occured setting default_milestone to \["alpha":.*?
-Changed default_component from \["core"\] to \["ui"\]./m,
+    $out, qr/^Changed default_component from \["core"\] to \["ui"\].
+An error occured setting default_milestone to \["alpha":.*?/m,
     'interactive settings edit with JSON error'
 );
 

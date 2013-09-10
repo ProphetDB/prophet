@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/perl
 #
 use warnings;
 use strict;
@@ -79,7 +79,7 @@ my @cmds = (
     {
         cmd => ['show'],
         output =>
-          qr/Active aliases for the current repository \(including user-wide and global\naliases if not overridden\):\n\npull -l = pull --local\npull -a = pull --all/,
+          qr/Active aliases for the current repository \(including user-wide and global\naliases if not overridden\):\n\npull -a = pull --all\npull -l = pull --local/,
         comment => 'show',
     },
     {

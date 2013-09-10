@@ -74,7 +74,7 @@ sub make_template {
     # ones in the DB) -- current values from the DB are retrieved in
     # _make_template_entry)
     my $settings = $self->app_handle->database_settings;
-    for my $name ( keys %$settings ) {
+    for my $name ( sort keys %$settings ) {
         my @metadata = @{ $settings->{$name} };
         my $s        = $self->app_handle->setting(
             label   => $name,
@@ -124,7 +124,7 @@ sub parse_template {
 
     }
 
-    for my $uuid ( keys %content ) {
+    for my $uuid ( sort keys %content ) {
         my $data = join( "\n", @{ $content{$uuid} } );
         if ( $data =~ /^(.*?)\s*:\s*(.*)\s*$/ms ) {
             my $label   = $1;
@@ -150,7 +150,7 @@ sub process_template {
 
     my $settings_changed = 0;
 
-    for my $uuid ( keys %$config ) {
+    for my $uuid ( sort keys %$config ) {
 
         # the parsed template could conceivably contain nonexistent uuids
         my $s;
