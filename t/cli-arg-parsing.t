@@ -77,48 +77,48 @@ diag('parse_args testing');
 
 diag('primary commands only');
 $context->parse_args(qw(search));
-is_deeply( $context->primary_commands, ['search'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['search'], 'primary commands are correct' );
 is( $context->arg_names,  0, 'no args were set' );
 is( $context->prop_names, 0, 'no props were set' );
 reset_context($context);
 
 diag('primary commands + args with no values');
 $context->parse_args(qw(show --verbose --test));
-is_deeply( $context->primary_commands, ['show'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['show'], 'primary commands are correct' );
 is( $context->arg('verbose'), undef, 'verbose arg set correctly' );
 is( $context->arg('test'),    undef, 'test arg set correctly' );
 reset_context($context);
 
 diag('primary commands + mixed args with vals and not');
 $context->parse_args(qw(show --test bar --zap));
-is_deeply( $context->primary_commands, ['show'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['show'], 'primary commands are correct' );
 is( $context->arg('zap'),  undef, 'zap arg set correctly' );
 is( $context->arg('test'), 'bar', 'test arg set correctly' );
 reset_context($context);
 
 diag('primary commands + mixed args with vals and not (swapped)');
 $context->parse_args(qw(show --test --zap bar));
-is_deeply( $context->primary_commands, ['show'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['show'], 'primary commands are correct' );
 is( $context->arg('zap'),  'bar', 'zap arg set correctly' );
 is( $context->arg('test'), undef, 'test arg set correctly' );
 reset_context($context);
 
 diag('primary commands + multiple args with vals');
 $context->parse_args(qw(show --test bar --zap baz));
-is_deeply( $context->primary_commands, ['show'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['show'], 'primary commands are correct' );
 is( $context->arg('zap'),  'baz', 'zap arg set correctly' );
 is( $context->arg('test'), 'bar', 'test arg set correctly' );
 reset_context($context);
 
 diag('primary commands + props only');
 $context->parse_args(qw(update -- name=Larry species beatle));
-is_deeply( $context->primary_commands, ['update'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['update'], 'primary commands are correct' );
 is( $context->prop('name'),    'Larry',  'name prop set correctly' );
 is( $context->prop('species'), 'beatle', 'species prop set correctly' );
 
@@ -152,8 +152,8 @@ diag(
 # removed colour<> red as we don't support not having a space between the
 # prop end and the comparator if there's a space after it
 $context->parse_args(qw(update -- legs!=8 eyes ne 2 spots =~0));
-is_deeply( $context->primary_commands, ['update'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['update'], 'primary commands are correct' );
 is( $context->prop('legs'), '8', 'legs prop set correctly' );
 is( $context->prop('eyes'), '2', 'eyes prop set correctly' );
 
@@ -197,8 +197,8 @@ diag(
     'args and props and check --props... the -- should trigger new props with undef values'
 );
 $context->parse_args(qw(update --verbose --props --name --Curly));
-is_deeply( $context->primary_commands, ['update'],
-    'primary commands are correct' );
+is_deeply( $context->primary_commands,
+    ['update'], 'primary commands are correct' );
 is( $context->arg('verbose'), undef, 'verbose arg set correctly' );
 is( $context->prop('name'),   undef, 'name prop set correctly' );
 is( $context->prop('Curly'),  undef, 'Curly prop set correctly' );

@@ -166,7 +166,7 @@ sub child {
 
             $base_path =~ s/index\.html$//;
             $base_path =~ s/\/+$//;
-            $url       =~ s/\/+$//;
+            $url =~ s/\/+$//;
 
             if ( $url eq $base_path ) {
                 $self->{children}{$key}->active(1);
@@ -303,7 +303,7 @@ sub as_link {
     }
 }
 
-__PACKAGE__->meta->make_immutable(inline_constructor => 0);
+__PACKAGE__->meta->make_immutable( inline_constructor => 0 );
 no Any::Moose;
 
 1;

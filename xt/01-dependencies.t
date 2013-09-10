@@ -25,7 +25,7 @@ find( \&wanted, qw/ lib bin t / );
 
 sub wanted {
     return unless -f $_;
-    return if $File::Find::dir  =~ m!/.svn($|/)!;
+    return if $File::Find::dir =~ m!/.svn($|/)!;
     return if $File::Find::name =~ /~$/;
     return if $File::Find::name =~ /\.(pod|html)$/;
 

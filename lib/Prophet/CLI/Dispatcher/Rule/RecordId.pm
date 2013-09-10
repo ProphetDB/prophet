@@ -22,7 +22,8 @@ sub complete {
 
     my @ids;
     for my $type (@types) {
-        push @ids, grep { substr( $_, 0, length($path) ) eq $path }
+        push @ids,
+          grep { substr( $_, 0, length($path) ) eq $path }
           map { ( $_->uuid, $_->luid ) } @{
             $handle->list_records(
                 type         => $type,

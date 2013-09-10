@@ -448,7 +448,7 @@ sub changes {
     my @changesets = $self->changesets;
 
     return grep { $_->record_uuid eq $uuid }
-      map { $_->changes } @changesets;
+      map       { $_->changes } @changesets;
 }
 
 =method uniq @list

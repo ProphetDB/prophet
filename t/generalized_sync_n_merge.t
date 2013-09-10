@@ -9,8 +9,7 @@ use_ok('Prophet::Test::Participant');
 my $arena = Prophet::Test::Arena->new();
 $arena->setup( shift || 5 );
 eval {
-    for (1)
-    {
+    for (1) {
         $arena->step('create_record');
     }
 

@@ -38,8 +38,10 @@ SKIP: {
 
     use_ok('Prophet::CLI::Command::Server');
     $context->set_arg( p => '8080' );
-    my $server =
-        Prophet::CLI::Command::Server->new( handle => $cxn, context => $context );
+    my $server = Prophet::CLI::Command::Server->new(
+        handle  => $cxn,
+        context => $context
+    );
     diag('Checking a subclass arg translation (with value)');
     is( $server->context->arg('port'),
         '8080', 'translation of -p to --port correct' );

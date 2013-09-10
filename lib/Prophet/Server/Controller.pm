@@ -83,8 +83,7 @@ sub handle_functions {
       execute_functions
     );
     eval {
-        for (@workflow)
-        {
+        for (@workflow) {
             $self->$_();
         }
     };
