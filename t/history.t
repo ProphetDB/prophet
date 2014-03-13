@@ -1,9 +1,9 @@
 package App::Record;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 
 package App::Record::Thingy;
-use Any::Moose;
+use Moo;
 extends 'App::Record';
 
 sub type {'foo'}

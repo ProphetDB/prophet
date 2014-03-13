@@ -1,5 +1,5 @@
 package Prophet::Replica::file;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Replica::prophet';
 sub scheme {'file'}
 
@@ -42,5 +42,4 @@ sub new {
     }
 }
 
-no Any::Moose;
 1;

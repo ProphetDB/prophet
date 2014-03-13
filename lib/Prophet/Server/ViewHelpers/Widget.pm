@@ -7,7 +7,7 @@ BEGIN {
     delete ${ __PACKAGE__ . "::" }{with};
 }
 
-use Any::Moose;
+use Moo;
 
 has function => (
     isa => 'Prophet::Server::ViewHelpers::Function',
@@ -89,7 +89,7 @@ sub _render_autocompleter {
     outs_raw(
             '<script>$("#'
           . $self->field->id
-          . '").autocomplete("/=/prophet/autocomplete",{ 
+          . '").autocomplete("/=/prophet/autocomplete",{
         selectFirst: true, autoFill: false, minChars: 0, delay: 0,
         extraParams: {
                     "function": "' . $self->field->name . '",
@@ -109,8 +109,6 @@ sub _generate_name {
       . $self->prop;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

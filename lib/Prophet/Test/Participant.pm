@@ -1,5 +1,5 @@
 package Prophet::Test::Participant;
-use Any::Moose;
+use Moo;
 use Prophet::Test;
 use Test::Exception;
 
@@ -224,7 +224,5 @@ sub call_func {
     return ( $ret, $str, undef );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

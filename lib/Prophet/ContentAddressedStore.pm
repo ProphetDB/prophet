@@ -1,5 +1,5 @@
 package Prophet::ContentAddressedStore;
-use Any::Moose;
+use Moo;
 
 use JSON;
 use Digest::SHA qw(sha1_hex);
@@ -35,5 +35,4 @@ sub filename {
 }
 
 __PACKAGE__->meta->make_immutable();
-no Any::Moose;
 1;

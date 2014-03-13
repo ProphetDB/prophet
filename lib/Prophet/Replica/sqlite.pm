@@ -1,5 +1,5 @@
 package Prophet::Replica::sqlite;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Replica';
 use Params::Validate qw(:all);
 use File::Spec ();
@@ -388,7 +388,7 @@ sub _delete_record_props_from_db {
     $self->delete_cached_prop( $args{uuid} );
 }
 
-=method traverse_changesets { after => SEQUENCE_NO, UNTIL => SEQUENCE_NO, callback => sub { } } 
+=method traverse_changesets { after => SEQUENCE_NO, UNTIL => SEQUENCE_NO, callback => sub { } }
 
 Walks through all changesets from $after to $until, calling $callback on each.
 
@@ -1105,7 +1105,5 @@ sub DEMOLISH {
     $self->dbh->disconnect if ( $self->replica_exists and $self->dbh );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

@@ -7,7 +7,7 @@ BEGIN {
     delete ${ __PACKAGE__ . "::" }{with};
 }
 
-use Any::Moose;
+use Moo;
 use Any::Moose 'Util::TypeConstraints';
 
 has function => (
@@ -56,8 +56,6 @@ sub _generate_name {
       . $self->prop;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

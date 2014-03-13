@@ -1,5 +1,5 @@
 package Prophet::CLI::CollectionCommand;
-use Any::Moose 'Role';
+use Moo::Role;
 with 'Prophet::CLI::RecordCommand';
 
 use Params::Validate;
@@ -21,7 +21,6 @@ sub get_collection_object {
     return $records;
 }
 
-no Any::Moose 'Role';
 
 1;
 

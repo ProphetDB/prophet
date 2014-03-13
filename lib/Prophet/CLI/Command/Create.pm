@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Create;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 
@@ -43,8 +43,6 @@ sub run {
       . $record->uuid . ")" . "\n";
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

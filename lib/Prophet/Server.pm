@@ -1,5 +1,5 @@
 package Prophet::Server;
-use Any::Moose;
+use Moo;
 
 # this instead of extends silences "You inherit from non-Mouse class" warning
 use base 'HTTP::Server::Simple::CGI';
@@ -509,7 +509,5 @@ sub make_link_relative {
     return URI::file->new($link)->rel( "file://" . $self->cgi->path_info() );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

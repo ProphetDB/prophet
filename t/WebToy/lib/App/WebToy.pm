@@ -1,5 +1,5 @@
 package App::WebToy;
-use Any::Moose;
+use Moo;
 use App::WebToy::Model::WikiPage;
 extends 'Prophet::App';
 
@@ -11,8 +11,6 @@ sub set_db_defaults {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

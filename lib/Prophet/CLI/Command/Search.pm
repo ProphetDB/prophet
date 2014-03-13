@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Search;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 with 'Prophet::CLI::CollectionCommand';
@@ -187,7 +187,7 @@ to a list of hashes of the form:
 
     { label => $label,
       records => \@records }
-      
+
 =cut
 
 sub group_by_prop {
@@ -232,7 +232,5 @@ sub out_record {
     print $record->format_summary . "\n";
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

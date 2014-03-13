@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 package Prophet::CLI::Command::Shell;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 use File::Spec;
 use Prophet::Util;
@@ -148,8 +148,6 @@ sub _write_repl_history {
     };
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

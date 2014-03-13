@@ -1,5 +1,5 @@
 package Prophet::Test::Arena;
-use Any::Moose;
+use Moo;
 
 has chickens => (
     is         => 'rw',
@@ -186,7 +186,5 @@ sub record {
     $self->add_history( [ $name, $action, $stored ] );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

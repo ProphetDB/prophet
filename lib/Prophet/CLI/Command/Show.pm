@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Show;
-use Any::Moose;
+use Moo;
 use Params::Validate;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
@@ -95,8 +95,6 @@ sub format_prop {
     return "$field: $value\n";
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

@@ -1,5 +1,5 @@
 package Prophet::ConflictingChange;
-use Any::Moose;
+use Moo;
 use Prophet::Meta::Types;
 use Prophet::ConflictingPropChange;
 use JSON 'to_json';
@@ -81,7 +81,5 @@ sub fingerprint {
     return sha1_hex( to_json( $struct, { utf8 => 1, canonical => 1 } ) );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

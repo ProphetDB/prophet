@@ -1,19 +1,20 @@
 package Prophet::CLI::Command;
-use Any::Moose;
+use Moo;
 
 use Prophet::CLI;
 use Params::Validate qw(validate);
+use Types::Standard qw/InstanceOf Str/;
 
 has cli => (
     is       => 'rw',
-    isa      => 'Prophet::CLI',
+    isa      => InstanceOf['Prophet::CLI'],
     weak_ref => 1,
     handles  => [ qw/app_handle handle config/, ],
 );
 
 has context => (
     is      => 'rw',
-    isa     => 'Prophet::CLIContext',
+    isa     => InstanceOf['Prophet::CLIContext'],
     handles => [
         qw/args  set_arg  arg  has_arg  delete_arg  arg_names/,
         qw/props set_prop prop has_prop delete_prop prop_names/,
@@ -25,7 +26,7 @@ has context => (
 
 has editor_var => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => Str,
     default => 'PROPHET_EDITOR',
 );
 
@@ -366,7 +367,5 @@ sub get_cmd_and_subcmd_names {
     return ( $cmd, $type_and_subcmd );
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

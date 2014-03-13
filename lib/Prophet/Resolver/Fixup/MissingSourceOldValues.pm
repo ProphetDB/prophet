@@ -1,5 +1,5 @@
 package Prophet::Resolver::Fixup::MissingSourceOldValues;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Resolver';
 
 sub run {
@@ -21,8 +21,6 @@ sub run {
     return $resolution;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

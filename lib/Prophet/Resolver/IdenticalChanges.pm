@@ -1,5 +1,5 @@
 package Prophet::Resolver::IdenticalChanges;
-use Any::Moose;
+use Moo;
 use Params::Validate qw(:all);
 use Prophet::Change;
 extends 'Prophet::Resolver';
@@ -43,8 +43,6 @@ sub run {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

@@ -1,5 +1,5 @@
 package Prophet::CLI;
-use Any::Moose;
+use Moo;
 
 use Prophet;
 use Prophet::Replica;
@@ -10,10 +10,11 @@ use Prophet::Record;
 
 use List::Util 'first';
 use Text::ParseWords qw(shellwords);
+use Types::Standard qw/Bool ClassName InstanceOf/;
 
 has app_class => (
     is      => 'rw',
-    isa     => 'ClassName',
+    isa     => ClassName,
     default => 'Prophet::App',
 );
 
@@ -25,11 +26,11 @@ L<Prophet::CLI::Dispatcher>. Override using:
 
     has '+dispatcher_class' => ( default => 'MyApp::Dispatcher' );
 
-=cut 
+=cut
 
 has dispatcher_class => (
     is      => 'rw',
-    isa     => 'ClassName',
+    isa     => ClassName,
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -43,14 +44,14 @@ has dispatcher_class => (
 
 has record_class => (
     is      => 'rw',
-    isa     => 'ClassName',
+    isa     => ClassName,
     lazy    => 1,
     default => 'Prophet::Record',
 );
 
 has app_handle => (
     is      => 'rw',
-    isa     => 'Prophet::App',
+    isa     => InstanceOf['Prophet::App'],
     lazy    => 1,
     handles => [qw/handle config/],
     default => sub {
@@ -60,7 +61,7 @@ has app_handle => (
 
 has context => (
     is      => 'rw',
-    isa     => 'Prophet::CLIContext',
+    isa     => InstanceOf['Prophet::CLIContext'],
     lazy    => 1,
     default => sub {
         return Prophet::CLIContext->new( app_handle => shift->app_handle );
@@ -70,7 +71,7 @@ has context => (
 
 has interactive_shell => (
     is      => 'rw',
-    isa     => 'Bool',
+    isa     => Bool,
     default => 0,
 );
 
@@ -233,8 +234,6 @@ END {
     *STDOUT = $ORIGINAL_STDOUT if $ORIGINAL_STDOUT;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

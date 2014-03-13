@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Update;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 
@@ -78,8 +78,6 @@ sub run {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

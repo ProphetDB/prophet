@@ -1,5 +1,5 @@
 package Prophet::Replica::FS::Backend::LWP;
-use Any::Moose;
+use Moo;
 use Params::Validate qw/validate validate_pos/;
 use LWP::UserAgent;
 
@@ -75,6 +75,5 @@ sub can_write {
 
 }
 
-no Any::Moose;
 
 1;

@@ -1,5 +1,5 @@
 package App::Record;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 
 sub validate_prop_point {

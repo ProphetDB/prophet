@@ -1,5 +1,5 @@
 package Prophet::FilesystemReplica;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Replica';
 use File::Spec;
 use Params::Validate qw(:all);
@@ -120,7 +120,7 @@ sub _changeset_index_size {
 
 }
 
-=method traverse_changesets { after => SEQUENCE_NO, callback => sub { } } 
+=method traverse_changesets { after => SEQUENCE_NO, callback => sub { } }
 
 Walks through all changesets from $after to $until, calling $callback on each.
 
@@ -326,6 +326,5 @@ sub fetch_local_metadata {
 
 }
 
-no Any::Moose;
 
 1;

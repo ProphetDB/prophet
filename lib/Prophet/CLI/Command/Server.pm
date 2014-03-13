@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Server;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 
 has server => (
@@ -55,8 +55,6 @@ sub setup_server {
     return $server;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

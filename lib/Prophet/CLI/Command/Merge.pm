@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Merge;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::ProgressBar';
 with 'Prophet::CLI::MirrorCommand';
@@ -217,8 +217,6 @@ sub merge_resolver {
     return $resolver;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

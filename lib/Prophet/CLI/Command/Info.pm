@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Info;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 
 sub ARG_TRANSLATIONS { shift->SUPER::ARG_TRANSLATIONS(), l => 'local' }
@@ -47,7 +47,5 @@ sub run {
     #     .join(',', @{$self->handle->resolution_db_handle->list_types} )."\n";
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

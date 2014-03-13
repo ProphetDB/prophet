@@ -1,5 +1,5 @@
 package Prophet::CLI::RecordCommand;
-use Any::Moose 'Role';
+use Moo::Role;
 use Params::Validate;
 use Prophet::Record;
 
@@ -96,7 +96,6 @@ sub _type_to_record_class {
     return 'Prophet::Record';
 }
 
-no Any::Moose 'Role';
 
 1;
 

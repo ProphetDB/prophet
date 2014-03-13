@@ -7,7 +7,7 @@ BEGIN {
     delete ${ __PACKAGE__ . "::" }{with};
 }
 
-use Any::Moose;
+use Moo;
 use Any::Moose 'Util::TypeConstraints';
 
 has record => (
@@ -64,6 +64,5 @@ sub render {
 }
 
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
-no Any::Moose;
 1;
 

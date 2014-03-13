@@ -1,5 +1,5 @@
 package Prophet::CLI::PublishCommand;
-use Any::Moose 'Role';
+use Moo::Role;
 
 use File::Temp ();
 
@@ -85,7 +85,6 @@ END_DIE_MSG
     }
 }
 
-no Any::Moose 'Role';
 
 1;
 

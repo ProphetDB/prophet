@@ -2,7 +2,7 @@ package Prophet::Collection;
 
 # ABSTRACT: Collections of L<Prophet::Record> objects
 
-use Any::Moose;
+use Moo;
 use Params::Validate;
 use Prophet::Record;
 
@@ -85,8 +85,6 @@ sub matching {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

@@ -7,7 +7,7 @@ BEGIN {
     delete ${ __PACKAGE__ . "::" }{with};
 }
 
-use Any::Moose;
+use Moo;
 
 extends 'Prophet::Server::ViewHelpers::Widget';
 
@@ -40,8 +40,6 @@ sub render {
     outs_raw( $self->field->render_input );
 
 }
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

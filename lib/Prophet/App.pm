@@ -1,13 +1,17 @@
 package Prophet::App;
-use Any::Moose;
+
+# ABSTRACT: Main Prophet application module
+
+use Moo;
 use File::Spec ();
 use Prophet::Config;
 use Prophet::UUIDGenerator;
 use Params::Validate qw/validate validate_pos/;
+use Types::Standard 'InstanceOf';
 
 has handle => (
     is      => 'rw',
-    isa     => 'Prophet::Replica',
+    isa     => InstanceOf['Prophet::Replica'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -31,7 +35,7 @@ has handle => (
 
 has config => (
     is      => 'rw',
-    isa     => 'Prophet::Config',
+    isa     => InstanceOf['Prophet::Config'],
     default => sub {
         my $self = shift;
         return Prophet::Config->new(
@@ -256,7 +260,5 @@ sub display_name_for_replica {
     return exists $sources_by_uuid{$uuid} ? $sources_by_uuid{$uuid} : $uuid;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

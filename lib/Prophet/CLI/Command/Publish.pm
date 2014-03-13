@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Publish;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command::Export';
 with 'Prophet::CLI::PublishCommand';
 with 'Prophet::CLI::CollectionCommand';
@@ -146,8 +146,6 @@ sub types_to_render {
       grep { !$self->should_skip_type($_) } @{ $self->handle->list_types };
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

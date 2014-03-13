@@ -2,7 +2,7 @@ package Prophet::Change;
 
 # ABSTRACT: encapsulates a change to a single record in a Prophet replica.
 
-use Any::Moose;
+use Moo;
 use Prophet::Meta::Types;
 use Prophet::PropChange;
 use Params::Validate;
@@ -207,7 +207,5 @@ sub new_from_hashref {
     return $self;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

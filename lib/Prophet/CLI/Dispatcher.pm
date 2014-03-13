@@ -1,7 +1,7 @@
 package Prophet::CLI::Dispatcher;
 use Path::Dispatcher::Declarative -base;
-use Any::Moose;
-extends 'Path::Dispatcher::Declarative', any_moose('Object');
+use Moo;
+extends 'Path::Dispatcher::Declarative';
 
 use Prophet::CLI::Dispatcher::Rule::RecordId;
 
@@ -173,8 +173,5 @@ sub class_names {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
-

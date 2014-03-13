@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Aliases;
-use Any::Moose;
+use Moo;
 use Params::Validate qw/validate/;
 
 extends 'Prophet::CLI::Command::Config';
@@ -163,7 +163,7 @@ sub process_template {
 
 # override the messages from Config module with messages w/better context for
 # Aliases
-override delete_usage_msg => sub {
+sub delete_usage_msg  {
     my $self    = shift;
     my $app_cmd = $self->cli->get_script_name;
     my $cmd     = shift;
@@ -171,7 +171,7 @@ override delete_usage_msg => sub {
     qq{usage: ${app_cmd}${cmd} "alias text"\n};
 };
 
-override add_usage_msg => sub {
+sub add_usage_msg {
     my $self    = shift;
     my $app_cmd = $self->cli->get_script_name;
     my ( $cmd, $subcmd ) = @_;
@@ -179,7 +179,5 @@ override add_usage_msg => sub {
     qq{usage: ${app_cmd}$cmd $subcmd "alias text" "cmd to translate to"\n};
 };
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

@@ -2,7 +2,7 @@ use warnings;
 use strict;
 
 package App::Settings::Bug;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 
 use base qw/Prophet::Record/;

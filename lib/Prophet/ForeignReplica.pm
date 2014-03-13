@@ -2,7 +2,7 @@ package Prophet::ForeignReplica;
 
 # ABSTRACT: Base for 2nd-class replicas
 
-use Any::Moose;
+use Moo;
 use Params::Validate qw(:all);
 extends 'Prophet::Replica';
 
@@ -153,8 +153,6 @@ sub log {
     $self->app_handle->log( $self->url . ": " . $msg );
 }
 
-no Any::Moose;
-__PACKAGE__->meta->make_immutable;
 
 1;
 

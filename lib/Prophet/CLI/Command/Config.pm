@@ -1,13 +1,16 @@
 package Prophet::CLI::Command::Config;
-use Any::Moose;
+use Moo;
+
 use Params::Validate qw/validate/;
+use Types::Standard 'Str';
+
 extends 'Prophet::CLI::Command';
 
 with 'Prophet::CLI::TextEditorCommand';
 
 has config_filename => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => Str,
     lazy    => 1,
     default => sub {
         $_[0]->app_handle->config->replica_config_file;
@@ -16,7 +19,7 @@ has config_filename => (
 
 has old_errors => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => Str,
     default => '',
 );
 
@@ -361,8 +364,6 @@ sub add_usage_msg {
     qq{usage: ${app_cmd}${cmd} ${subcmd} section.subsection.var ["key value"]\n};
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

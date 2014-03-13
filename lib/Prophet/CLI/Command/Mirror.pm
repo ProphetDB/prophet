@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Mirror;
-use Any::Moose;
+use Moo;
 use Params::Validate qw/:all/;
 
 extends 'Prophet::CLI::Command';
@@ -50,7 +50,5 @@ sub validate_args {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

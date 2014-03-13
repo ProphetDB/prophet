@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::History;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 
@@ -23,8 +23,6 @@ sub run {
     print $record->history_as_string;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

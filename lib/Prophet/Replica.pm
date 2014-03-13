@@ -2,56 +2,52 @@ package Prophet::Replica;
 
 # ABSTRACT: base class for all Prophet replicas.
 
-use Any::Moose;
+use Moo;
 use Params::Validate qw(:all);
 use File::Spec ();
 use File::Path qw/mkpath/;
+use Types::Standard qw/Bool CodeRef InstanceOf Str/;
 
 use constant state_db_uuid => 'state';
 
 use Prophet::App;
 
+with 'Prophet::Role::Common';
+
 has metadata_store => (
     is            => 'rw',
-    isa           => 'Prophet::MetadataStore',
+    isa           => InstanceOf['Prophet::MetadataStore'],
     documentation => 'Where metadata about other replicas is stored.',
 );
 
 has resolution_db_handle => (
     is            => 'rw',
-    isa           => 'Prophet::Replica',
+    isa           => InstanceOf['Prophet::Replica'],
     documentation => 'Where conflict resolutions are stored.',
 );
 
 has is_resdb => (
     is            => 'rw',
-    isa           => 'Bool',
+    isa           => Bool,
     documentation => 'Whether this replica is a resolution db or not.'
 );
 
 has db_uuid => (
     is            => 'rw',
-    isa           => 'Str',
+    isa           => Str,
     documentation => 'The uuid of this replica.',
 );
 sub set_db_uuid { shift->db_uuid(@_) }
 
 has url => (
     is            => 'rw',
-    isa           => 'Str',
+    isa           => Str,
     documentation => 'Where this replica comes from.',
-);
-
-has app_handle => (
-    is        => 'ro',
-    isa       => 'Prophet::App',
-    weak_ref  => 1,
-    predicate => 'has_app_handle',
 );
 
 has after_initialize => (
     is      => 'rw',
-    isa     => 'CodeRef',
+    isa     => CodeRef,
     default => sub {
         sub {1}
       }    # default returns a coderef
@@ -59,7 +55,7 @@ has after_initialize => (
 
 has uuid_generator => (
     is      => 'rw',
-    isa     => 'Prophet::UUIDGenerator',
+    isa     => InstanceOf['Prophet::UUIDGenerator'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -1229,7 +1225,6 @@ sub display_name_for_replica {
 }
 
 __PACKAGE__->meta->make_immutable();
-no Any::Moose;
 
 1;
 

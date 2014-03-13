@@ -1,5 +1,5 @@
 package Prophet::CLI::ProgressBar;
-use Any::Moose 'Role';
+use Moo::Role;
 
 use Time::Progress;
 use Params::Validate ':all';
@@ -27,7 +27,6 @@ sub progress_bar {
       }
 }
 
-no Any::Moose 'Role';
 
 1;
 

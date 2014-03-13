@@ -1,6 +1,5 @@
 package Prophet::Replica::FS::Backend::SSH;
-use Any::Moose;
+use Moo;
 
-no Any::Moose;
 
 1;

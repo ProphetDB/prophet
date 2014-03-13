@@ -1,8 +1,6 @@
 package Prophet::CLI::Dispatcher::Rule;
-use Any::Moose 'Role';
+use Moo::Role;
 with 'Prophet::CLI::Parameters';
-
-no Any::Moose 'Role';
 
 1;
 

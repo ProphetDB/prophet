@@ -1,5 +1,5 @@
 package TestApp::BugCatcher;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 
 has type => (
@@ -10,6 +10,4 @@ has type => (
 __PACKAGE__->register_reference( bugs => 'TestApp::Bugs', by => 'bugcatcher' );
 __PACKAGE__->register_reference( net => 'TestApp::ButterflyNet' );
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;

@@ -2,7 +2,7 @@ package Prophet::ConflictingPropChange;
 
 # ABSTRACT: Conflicting property changes
 
-use Any::Moose;
+use Moo;
 
 =attr name
 
@@ -58,8 +58,6 @@ sub as_hash {
     return $hashref;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

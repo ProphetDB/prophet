@@ -1,5 +1,5 @@
 package TestApp::Bug;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 
 has type => (
@@ -29,7 +29,5 @@ sub canonicalize_prop_email {
 
 sub default_prop_status {'new'}
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

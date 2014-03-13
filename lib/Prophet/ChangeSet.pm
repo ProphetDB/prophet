@@ -2,7 +2,7 @@ package Prophet::ChangeSet;
 
 # ABSTRACT: represents a single, atomic Prophet database update.
 
-use Any::Moose;
+use Moo;
 use Prophet::Change;
 use Params::Validate;
 use Digest::SHA qw/sha1_hex/;
@@ -304,8 +304,6 @@ sub canonical_json_representation {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

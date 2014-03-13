@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Log;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command';
 
 sub usage_msg {
@@ -151,6 +151,4 @@ sub change_header {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;

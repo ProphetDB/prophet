@@ -2,7 +2,7 @@ package Prophet::ReplicaExporter;
 
 # ABSTRACT: Exports a replica to a serialized on-disk format.
 
-use Any::Moose;
+use Moo;
 use Params::Validate qw(:all);
 use File::Spec;
 use Prophet::Record;
@@ -119,7 +119,5 @@ sub export_changesets {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

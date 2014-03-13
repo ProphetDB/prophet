@@ -2,22 +2,18 @@ package Prophet::Config;
 
 # ABSTRACT: Prophet's configuration object
 
-use Any::Moose;
+use Moo;
 use File::Spec;
 use Prophet::Util;
 extends 'Config::GitLike';
 
-has app_handle => (
-    is       => 'ro',
-    weak_ref => 1,
-    isa      => 'Prophet::App',
-    required => 1
-);
+with 'Prophet::Role::Common';
 
 use constant FORMAT_VERSION => 0;
 
 # reload config after setting values
-override group_set => sub {
+around group_set => sub {
+    my $orig = shift;
     my $self = shift;
     my ( $filename, $args_ref, $override ) = @_;
 
@@ -30,7 +26,7 @@ override group_set => sub {
       }
       unless _file_has_config_format_version($filename);
 
-    $self->SUPER::group_set( $filename, $args_ref );
+    $self->$orig( $filename, $args_ref );
     $self->load unless $override;
 };
 
@@ -42,30 +38,32 @@ sub _file_has_config_format_version {
 }
 
 # per-replica config filename
-override dir_file => sub {'config'};
+sub dir_file {'config'};
 
 # Override the replica config file with the PROPHET_APP_CONFIG
 # env var if it's set. Also, don't walk up the given path if no replica
 # config is found.
-override load_dirs => sub {
+sub load_dirs {
     my $self = shift;
 
     $self->load_file( $self->replica_config_file )
       if -f $self->replica_config_file;
-};
+}
 
 # If PROPHET_APP_CONFIG is set, don't load anything else
-override user_file => sub {
+around user_file => sub {
+    my $orig = shift;
     my $self = shift;
 
-    return exists $ENV{PROPHET_APP_CONFIG} ? '' : $self->SUPER::user_file(@_);
+    return exists $ENV{PROPHET_APP_CONFIG} ? '' : $self->$orig(@_);
 };
 
-override global_file => sub {
+around global_file => sub {
+    my $orig = shift;
     my $self = shift;
 
     return
-      exists $ENV{PROPHET_APP_CONFIG} ? '' : $self->SUPER::global_file(@_);
+      exists $ENV{PROPHET_APP_CONFIG} ? '' : $self->$orig(@_);
 };
 
 =method aliases( $config_filename )
@@ -176,8 +174,6 @@ sub _file_if_exists {
     return ( -e $file ) ? $file : '';
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

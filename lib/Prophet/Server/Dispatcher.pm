@@ -1,5 +1,5 @@
 package Prophet::Server::Dispatcher;
-use Any::Moose;
+use Moo;
 use Path::Dispatcher::Declarative -base,
   -default => { token_delimiter => '/', };
 
@@ -99,7 +99,5 @@ under { method => 'GET' } => sub {
 
 on qr'^(.*)$' => sub { shift->server->show_template($1) || next_rule; };
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

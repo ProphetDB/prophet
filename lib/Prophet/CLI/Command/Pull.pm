@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Pull;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command::Merge';
 
 sub ARG_TRANSLATIONS { shift->SUPER::ARG_TRANSLATIONS(), l => 'local' }
@@ -127,7 +127,5 @@ sub find_bonjour_sources {
     return @bonjour_sources;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Clone;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command::Merge';
 
 sub usage_msg {
@@ -151,7 +151,5 @@ sub list_bonjour_sources {
     return;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

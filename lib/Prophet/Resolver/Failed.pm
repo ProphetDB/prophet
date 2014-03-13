@@ -1,5 +1,5 @@
 package Prophet::Resolver::Failed;
-use Any::Moose;
+use Moo;
 use Data::Dumper;
 extends 'Prophet::Resolver';
 $Data::Dumper::Indent = 1;
@@ -14,7 +14,5 @@ sub run {
 
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

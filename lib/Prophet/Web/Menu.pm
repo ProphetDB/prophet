@@ -1,7 +1,7 @@
 package Prophet::Web::Menu;
 
 # ABSTRACT: Handle the API for menu navigation
-use Any::Moose;
+use Moo;
 use URI;
 
 has cgi => (isa =>'CGI', is=>'ro');
@@ -304,7 +304,6 @@ sub as_link {
 }
 
 __PACKAGE__->meta->make_immutable( inline_constructor => 0 );
-no Any::Moose;
 
 1;
 

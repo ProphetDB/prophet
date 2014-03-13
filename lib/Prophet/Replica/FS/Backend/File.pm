@@ -1,5 +1,5 @@
 package Prophet::Replica::FS::Backend::File;
-use Any::Moose;
+use Moo;
 use Fcntl qw/SEEK_END/;
 use Params::Validate qw/validate validate_pos/;
 
@@ -99,6 +99,5 @@ sub can_write {
 
 }
 
-no Any::Moose;
 
 1;

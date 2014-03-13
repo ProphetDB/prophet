@@ -1,15 +1,21 @@
 package Prophet::CLI::Dispatcher::Rule::RecordId;
-use Any::Moose;
+use Moo;
 extends 'Path::Dispatcher::Rule::Regex';
 with 'Prophet::CLI::Dispatcher::Rule';
 
 use Prophet::CLIContext;
+use Types::Standard qw/RegexpRef Str/;
 
-has '+regex' => ( default => sub {qr/^$Prophet::CLIContext::ID_REGEX$/i} );
+#has '+regex' => ( default => sub {qr/^$Prophet::CLIContext::ID_REGEX$/i} );
+has regex => (
+    is       => 'ro',
+    isa      => RegexpRef,
+    default => sub {qr/^$Prophet::CLIContext::ID_REGEX$/i}
+);
 
 has type => (
     is  => 'ro',
-    isa => 'Str',
+    isa => Str,
 );
 
 sub complete {
@@ -34,8 +40,6 @@ sub complete {
     return @ids;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

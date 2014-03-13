@@ -1,5 +1,5 @@
 package Prophet::Replica::prophet_cache;
-use Any::Moose;
+use Moo;
 
 extends 'Prophet::FilesystemReplica';
 use Params::Validate ':all';
@@ -291,6 +291,5 @@ sub mirror_from {
     }
 }
 
-no Any::Moose;
 
 1;

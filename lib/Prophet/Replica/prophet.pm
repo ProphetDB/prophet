@@ -1,5 +1,5 @@
 package Prophet::Replica::prophet;
-use Any::Moose;
+use Moo;
 extends 'Prophet::FilesystemReplica';
 
 use Params::Validate qw(:all);
@@ -761,7 +761,6 @@ sub type_exists {
 }
 
 __PACKAGE__->meta->make_immutable();
-no Any::Moose;
 
 1;
 
@@ -780,13 +779,13 @@ no Any::Moose;
             /<record type> (for resolution is actually _prophet-resolution-<cas-key>)
                 /<record uuid> which is a file containing a list of 0 or more rows
                     last-changed-sequence-no : cas key
-                                    
+
         /changesets.idx
-    
+
             index which has records:
                 each record is : local-replica-seq-no : original-uuid : original-seq-no : cas key
             ...
-    
+
         /resolutions/
             /replica-uuid
             /latest-sequence-no
@@ -795,7 +794,7 @@ no Any::Moose;
                 /_prophet-resolution-<cas-key>   (cas-key == a hash the conflicting change)
                     /<record uuid>  (record uuid == the originating replica)
                         last-changed-sequence-no : <cas key to the content of the resolution>
-                                        
+
             /changesets.idx
                 index which has records:
                     each record is : local-replica-seq-no : original-uuid : original-seq-no : cas key

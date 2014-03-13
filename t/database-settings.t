@@ -1,5 +1,5 @@
 package MyApp::Model::Task;
-use Any::Moose;
+use Moo;
 extends 'Prophet::Record';
 use Prophet::DatabaseSetting;
 

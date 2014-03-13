@@ -1,5 +1,5 @@
 package Prophet::Resolver::AlwaysTarget;
-use Any::Moose;
+use Moo;
 use Data::Dumper;
 extends 'Prophet::Resolver';
 
@@ -29,8 +29,6 @@ sub run {
     return $resolution;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

@@ -2,7 +2,7 @@ package Prophet::PropChange;
 
 # ABSTRACT: A single property change.
 
-use Any::Moose;
+use Moo;
 
 =attr name
 
@@ -52,8 +52,6 @@ sub summary {
     return qq{> "$name" changed from "$old" to "$new".};
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

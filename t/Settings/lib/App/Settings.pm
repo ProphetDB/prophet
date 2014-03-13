@@ -1,5 +1,5 @@
 package App::Settings;
-use Any::Moose;
+use Moo;
 
 extends 'Prophet::App';
 our $VERSION = '0.01';
@@ -23,7 +23,5 @@ sub database_settings {
 
 }
 
-__PACKAGE__->meta->make_immutable;
 
-no Any::Moose;
 1;

@@ -1,5 +1,5 @@
 package Prophet::CLI::MirrorCommand;
-use Any::Moose 'Role';
+use Moo::Role;
 with 'Prophet::CLI::ProgressBar';
 use Params::Validate ':all';
 
@@ -53,7 +53,6 @@ sub sync_cache_from_source {
     );
 }
 
-no Any::Moose 'Role';
 
 1;
 

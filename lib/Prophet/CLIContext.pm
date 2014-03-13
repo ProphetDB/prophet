@@ -1,9 +1,10 @@
 package Prophet::CLIContext;
-use Any::Moose;
+use Moo;
+use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
 
 has app_handle => (
     is       => 'rw',
-    isa      => 'Prophet::App',
+    isa      => InstanceOf['Prophet::App'],
     lazy     => 1,
     handles  => [qw/handle resdb_handle config/],
     weak_ref => 1,
@@ -14,20 +15,20 @@ has app_handle => (
 
 has uuid => (
     is            => 'rw',
-    isa           => 'Str',
-    predicate     => 'has_uuid',
+    isa           => Str,
+    predicate     => 1,
     documentation => "This is the uuid set by the user from the commandline",
 );
 
 has type => (
     is            => 'rw',
-    isa           => 'Str',
+    isa           => Str,
     documentation => "This is the type set by the user from the commandline",
 );
 
 has args => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef,
     default => sub { {} },
     documentation =>
       "This is a reference to the key-value pairs passed in on the commandline",
@@ -35,7 +36,7 @@ has args => (
 
 has raw_args => (
     is      => 'rw',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
@@ -48,7 +49,7 @@ sub clear_args { %{ $_[0]->args } = () }
 
 has props => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef,
     default => sub { {} },
 );
 
@@ -67,7 +68,7 @@ sub clear_props {
 
 has prop_set => (
     is         => 'rw',
-    isa        => 'ArrayRef',
+    isa        => ArrayRef,
     default    => sub { [] },
     auto_deref => 1,
 );
@@ -83,7 +84,7 @@ sub add_to_prop_set {
 
 has primary_commands => (
     is            => 'rw',
-    isa           => 'ArrayRef',
+    isa           => ArrayRef,
     documentation => "The commands the user executes from the commandline",
 );
 
@@ -310,7 +311,5 @@ sub set_id {
     $self->set_uuid;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

@@ -1,5 +1,5 @@
 package Prophet::CLI::Command::Push;
-use Any::Moose;
+use Moo;
 extends 'Prophet::CLI::Command::Merge';
 
 sub usage_msg {
@@ -82,8 +82,6 @@ sub validate_args {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

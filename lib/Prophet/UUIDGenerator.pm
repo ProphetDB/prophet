@@ -2,8 +2,9 @@ package Prophet::UUIDGenerator;
 
 # ABSTRACT: Creates v4 & v5 UUIDs.
 
-use Any::Moose;
+use Moo;
 use MIME::Base64::URLSafe;
+use Types::Standard 'Int';
 use UUID::Tiny ':std';
 
 =attr uuid_scheme
@@ -17,7 +18,7 @@ UUIDs.
 # uuid_scheme: 1 - v1 and v3 uuids.
 #              2 - v4 and v5 uuids.
 has uuid_scheme => (
-    isa => 'Int',
+    isa => Int,
     is  => 'rw'
 );
 
@@ -98,8 +99,6 @@ sub set_uuid_scheme {
     }
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

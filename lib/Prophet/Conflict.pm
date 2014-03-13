@@ -1,5 +1,5 @@
 package Prophet::Conflict;
-use Any::Moose;
+use Moo;
 use Params::Validate;
 use Prophet::ConflictingPropChange;
 use Prophet::ConflictingChange;
@@ -111,7 +111,7 @@ sub generate_resolution {
     return 1;
 }
 
-=method generate_changeset_conflicts 
+=method generate_changeset_conflicts
 
 Given a changeset, populates $self->conflicting_changes with all the conflicts
 that applying that changeset to the target replica would result in.
@@ -298,8 +298,6 @@ sub generate_nullification_changeset {
     $self->nullification_changeset($nullification);
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;
 

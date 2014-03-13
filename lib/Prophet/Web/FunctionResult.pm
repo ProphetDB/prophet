@@ -1,5 +1,5 @@
 package Prophet::Web::FunctionResult;
-use Any::Moose;
+use Moo;
 
 has class => ( isa => 'Str', is => 'rw');
 has function_name => ( isa => 'Str', is => 'rw');
@@ -18,7 +18,5 @@ sub items  { keys %{ $_[0]->result } }
 sub get    { $_[0]->result > { $_[1] } }
 sub set    { $_[0]->result->{ $_[1] } = $_[2] }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 
 1;

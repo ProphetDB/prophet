@@ -2,14 +2,17 @@ package Prophet::Record;
 
 # ABSTRACT: Base class for records.
 
-use Any::Moose;
+use Moo;
+use Carp 'confess';
 use Params::Validate;
 use Term::ANSIColor;
 use Prophet::App;    # for require_module. Kinda hacky
+use Types::Standard qw/InstanceOf Maybe Str/;
+
 use constant collection_class => 'Prophet::Collection';
 
 has app_handle => (
-    isa      => 'Prophet::App|Undef',
+    isa      => Maybe[InstanceOf['Prophet::App']],
     is       => 'rw',
     required => 0,
 );
@@ -23,20 +26,20 @@ has handle => (
 
 has type => (
     is        => 'rw',
-    isa       => 'Str',
-    predicate => 'has_type',
+    isa       => Str,
+    predicate => 1,
     required  => 1,
     default   => sub {undef}
 );
 
 has uuid => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 has luid => (
     is      => 'rw',
-    isa     => 'Str|Undef',
+    isa     => Maybe[Str],
     lazy    => 1,
     default => sub { my $self = shift; $self->find_or_create_luid; },
 );
@@ -413,7 +416,7 @@ sub delete {
 
 }
 
-=method changesets { limit => $int } 
+=method changesets { limit => $int }
 
 Returns an ordered list of changeset objects for all changesets containing
 changes to the record specified by this record object.
@@ -927,8 +930,6 @@ sub collection_reference_methods {
       keys %accessors;
 }
 
-__PACKAGE__->meta->make_immutable;
-no Any::Moose;
 1;
 
 =head1 DESCRIPTION
