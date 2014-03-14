@@ -7,6 +7,7 @@ use Prophet::Change;
 use Params::Validate;
 use Digest::SHA qw/sha1_hex/;
 use JSON;
+use Prophet::Types qw/ArrayRef Bool Int Maybe Str/;
 
 =attr creator
 
@@ -16,7 +17,7 @@ A string representing who created this changeset.
 
 has creator => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 =attr created
@@ -28,7 +29,7 @@ created (UTC).
 
 has created => (
     is      => 'rw',
-    isa     => 'Str|Undef',
+    isa     => Maybe [Str],
     default => sub {
         my ( $sec, $min, $hour, $day, $month, $year ) = gmtime;
         $year += 1900;
@@ -47,7 +48,7 @@ The uuid of the replica sending us the change.
 
 has source_uuid => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 =attr sequence_no
@@ -59,7 +60,7 @@ replica sending us the changeset.
 
 has sequence_no => (
     is  => 'rw',
-    isa => 'Int|Undef',
+    isa => Maybe [Int],
 );
 
 =attr original_source_uuid
@@ -70,7 +71,7 @@ The uuid of the replica where the change was authored.
 
 has original_source_uuid => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr original_sequence_no
@@ -82,7 +83,7 @@ replica where the change was originally created.
 
 has original_sequence_no => (
     is  => 'rw',
-    isa => 'Int|Undef',
+    isa => Maybe [Int],
 );
 
 =head2 is_nullification
@@ -93,7 +94,7 @@ A boolean value specifying whether this is a nullification changeset or not.
 
 has is_nullification => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 =attr is_resolution
@@ -105,7 +106,7 @@ not.
 
 has is_resolution => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 =attr changes
@@ -115,15 +116,14 @@ Returns an array of all the changes in the current changeset.
 =cut
 
 has changes => (
-    is         => 'rw',
-    isa        => 'ArrayRef',
-    auto_deref => 1,
-    default    => sub { [] },
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 has sha1 => (
     is  => 'rw',
-    isa => 'Maybe[Str]'
+    isa => Maybe [Str]
 );
 
 =head2 has_changes
@@ -169,7 +169,7 @@ sub as_hash {
     my $self = shift;
     my $as_hash = { map { $_ => $self->$_() } @SERIALIZE_PROPS };
 
-    for my $change ( $self->changes ) {
+    for my $change ( @{ $self->changes } ) {
         $as_hash->{changes}->{ $change->record_uuid } = $change->as_hash;
     }
 
@@ -303,7 +303,6 @@ sub canonical_json_representation {
         { canonical => 1, pretty => 0, utf8 => 1 } );
 
 }
-
 
 1;
 

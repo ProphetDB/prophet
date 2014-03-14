@@ -5,13 +5,14 @@ package Prophet::Collection;
 use Moo;
 use Params::Validate;
 use Prophet::Record;
+use Types::Standard qw/ArrayRef InstanceOf Maybe Str/;
 
 use overload '@{}' => sub { shift->items }, fallback => 1;
 use constant record_class => 'Prophet::Record';
 
 has app_handle => (
     is       => 'rw',
-    isa      => 'Prophet::App|Undef',
+    isa      => Maybe [ InstanceOf ['Prophet::App'] ],
     required => 0,
     trigger  => sub {
         my ( $self, $app ) = @_;
@@ -21,12 +22,12 @@ has app_handle => (
 
 has handle => (
     is  => 'rw',
-    isa => 'Prophet::Replica',
+    isa => InstanceOf ['Prophet::Replica'],
 );
 
 has type => (
     is      => 'rw',
-    isa     => 'Str',
+    isa     => Str,
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -42,10 +43,9 @@ Returns a reference to an array of all the items found
 =cut
 
 has items => (
-    is         => 'rw',
-    isa        => 'ArrayRef',
-    default    => sub { [] },
-    auto_deref => 1,
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 sub count { scalar @{ $_[0]->items } }
@@ -84,7 +84,6 @@ sub matching {
     # XXX TODO return a count of items found
 
 }
-
 
 1;
 

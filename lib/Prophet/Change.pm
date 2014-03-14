@@ -3,7 +3,7 @@ package Prophet::Change;
 # ABSTRACT: encapsulates a change to a single record in a Prophet replica.
 
 use Moo;
-use Prophet::Meta::Types;
+use Prophet::Types qw/ArrayRef Bool ProphetChangeType Str/;
 use Prophet::PropChange;
 use Params::Validate;
 
@@ -15,7 +15,7 @@ The record type for the record.
 
 has record_type => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr record_uuid
@@ -26,7 +26,7 @@ The UUID of the record being changed.
 
 has record_uuid => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr change_type
@@ -37,12 +37,12 @@ One of C<add_file>, C<add_dir>, C<update_file>, C<delete>.
 
 has change_type => (
     is  => 'rw',
-    isa => 'Prophet::Type::ChangeType',
+    isa => ProphetChangeType,
 );
 
 has resolution_cas => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr is_resolution
@@ -54,7 +54,7 @@ or not.
 
 has is_resolution => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 =attr prop_changes [\@PROPCHANGES]
@@ -65,10 +65,9 @@ optional arrayref to fully replace the set of propchanges.
 =cut
 
 has prop_changes => (
-    is         => 'rw',
-    isa        => 'ArrayRef',
-    auto_deref => 1,
-    default    => sub { [] },
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 =attr has_prop_changes
@@ -136,7 +135,7 @@ sub as_hash {
     my $self  = shift;
     my $props = {};
 
-    for my $pc ( $self->prop_changes ) {
+    for my $pc ( @{ $self->prop_changes } ) {
         $props->{ $pc->name } =
           { old_value => $pc->old_value, new_value => $pc->new_value };
     }
@@ -206,6 +205,5 @@ sub new_from_hashref {
     }
     return $self;
 }
-
 
 1;

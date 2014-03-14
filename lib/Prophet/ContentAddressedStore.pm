@@ -3,11 +3,12 @@ use Moo;
 
 use JSON;
 use Digest::SHA qw(sha1_hex);
+use Types::Standard 'Str';
 
 has fs_root => ( is => 'rw', );
 
 has root => (
-    isa => 'Str',
+    isa => Str,
     is  => 'rw',
 );
 
@@ -34,5 +35,4 @@ sub filename {
         $self->root => Prophet::Util::hashed_dir_name($key) );
 }
 
-__PACKAGE__->meta->make_immutable();
 1;

@@ -3,6 +3,7 @@ package Prophet::PropChange;
 # ABSTRACT: A single property change.
 
 use Moo;
+use Prophet::Types qw/Maybe Str/;
 
 =attr name
 
@@ -12,7 +13,7 @@ The name of the property we're talking about.
 
 has name => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr old_value
@@ -23,7 +24,7 @@ What L</name> changed I<from>.
 
 has old_value => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 =head2 new_value
@@ -34,7 +35,7 @@ What L</name> changed I<to>.
 
 has new_value => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 sub summary {
@@ -51,7 +52,6 @@ sub summary {
 
     return qq{> "$name" changed from "$old" to "$new".};
 }
-
 
 1;
 

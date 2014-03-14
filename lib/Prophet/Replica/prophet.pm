@@ -13,7 +13,7 @@ use Prophet::Util;
 use POSIX qw();
 use Memoize;
 use Prophet::ContentAddressedStore;
-
+use Types::Standard qw/ArrayRef InstanceOf Int Maybe/;
 use JSON;
 use Digest::SHA qw(sha1_hex);
 
@@ -26,7 +26,7 @@ has _uuid => ( is => 'rw', );
 
 has _replica_version => (
     is      => 'rw',
-    isa     => 'Int',
+    isa     => Int,
     lazy    => 1,
     default => sub { shift->_read_file('replica-version') || 0 }
 );
@@ -55,7 +55,7 @@ has fs_root => (
 
 has record_cas => (
     is      => 'rw',
-    isa     => 'Prophet::ContentAddressedStore',
+    isa     => InstanceOf ['Prophet::ContentAddressedStore'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -70,7 +70,7 @@ has record_cas => (
 
 has changeset_cas => (
     is      => 'rw',
-    isa     => 'Prophet::ContentAddressedStore',
+    isa     => InstanceOf ['Prophet::ContentAddressedStore'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -85,17 +85,18 @@ has changeset_cas => (
 
 has current_edit => (
     is  => 'rw',
-    isa => 'Maybe[Prophet::ChangeSet]',
+    isa => Maybe [ InstanceOf ['Prophet::ChangeSet'] ],
 );
 
 has current_edit_records => (
     is      => 'rw',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
 has '+resolution_db_handle' => (
-    isa     => 'Prophet::Replica | Undef',
+    isa => Maybe [ InstanceOf ['Prophet::Replica'] ],
+    ,
     lazy    => 1,
     default => sub {
         my $self = shift;

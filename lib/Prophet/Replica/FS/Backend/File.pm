@@ -2,9 +2,10 @@ package Prophet::Replica::FS::Backend::File;
 use Moo;
 use Fcntl qw/SEEK_END/;
 use Params::Validate qw/validate validate_pos/;
+use Types::Standard 'Str';
 
-has url => ( is => 'rw', isa => 'Str');
-has fs_root => ( is => 'rw', isa => 'Str');
+has url => ( is => 'rw', isa => Str);
+has fs_root => ( is => 'rw', isa => Str);
 
 sub read_file {
     my $self   = shift;
@@ -98,6 +99,5 @@ sub can_write {
     1;
 
 }
-
 
 1;
