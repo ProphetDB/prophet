@@ -1,6 +1,8 @@
 package Prophet::Replica::sqlite;
+
 use Moo;
 extends 'Prophet::Replica';
+
 use Params::Validate qw(:all);
 use File::Spec ();
 use File::Path;
@@ -8,10 +10,11 @@ use Prophet::Util;
 use JSON;
 use Digest::SHA qw/sha1_hex/;
 use DBI;
+use Prophet::Types qw/ArrayRef InstanceOf Int Maybe/;
 
 has dbh => (
     is      => 'rw',
-    isa     => 'DBI::db',
+    isa     => InstanceOf ['DBI::db'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -50,7 +53,7 @@ has _uuid => ( is => 'rw', );
 
 has _replica_version => (
     is      => 'rw',
-    isa     => 'Int',
+    isa     => Int,
     lazy    => 1,
     default => sub { shift->fetch_local_metadata('replica-version') || 0 }
 );
@@ -81,12 +84,12 @@ has current_edit => ( is => 'rw', );
 
 has current_edit_records => (
     is      => 'rw',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
 has '+resolution_db_handle' => (
-    isa     => 'Prophet::Replica | Undef',
+    isa => Maybe [ InstanceOf ['Prophet::Replica'] ],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -1104,6 +1107,5 @@ sub DEMOLISH {
     my $self = shift;
     $self->dbh->disconnect if ( $self->replica_exists and $self->dbh );
 }
-
 
 1;

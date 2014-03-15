@@ -1,21 +1,23 @@
-#!/usr/bin/env perl
 package Prophet::CLI::Command::Shell;
+
 use Moo;
 extends 'Prophet::CLI::Command';
+
 use File::Spec;
 use Prophet::Util;
 use Text::ParseWords qw(shellwords);
 use Scalar::Util qw(weaken);
+use Prophet::Types qw/InstanceOf Str/;
 
 has name => (
     is      => 'ro',
-    isa     => 'Str',
+    isa     => Str,
     default => sub { Prophet::Util->updir($0) }
 );
 
 has term => (
     is      => 'ro',
-    isa     => 'Term::ReadLine::Stub',
+    isa     => InstanceOf ['Term::ReadLine::Stub'],
     lazy    => 1,
     handles => [qw/readline addhistory/],
     default => sub {
@@ -147,7 +149,6 @@ sub _write_repl_history {
           or warn "Unable to write to shell history file $HIST";
     };
 }
-
 
 1;
 

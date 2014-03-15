@@ -3,6 +3,7 @@ package Prophet::ConflictingPropChange;
 # ABSTRACT: Conflicting property changes
 
 use Moo;
+use Prophet::Types qw/Maybe Str/;
 
 =attr name
 
@@ -12,7 +13,7 @@ The property name for the conflict in question
 
 has name => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 =attr source_old_value
@@ -23,7 +24,7 @@ The inital (old) state from the change being merged in
 
 has source_old_value => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 =attr target_value
@@ -34,7 +35,7 @@ The current target-replica value of the property being merged.
 
 has target_value => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 =attr source_new_value
@@ -45,7 +46,7 @@ The final (new) state of the property from the change being merged in.
 
 has source_new_value => (
     is  => 'rw',
-    isa => 'Str|Undef',
+    isa => Maybe [Str],
 );
 
 sub as_hash {
@@ -57,7 +58,6 @@ sub as_hash {
     }
     return $hashref;
 }
-
 
 1;
 

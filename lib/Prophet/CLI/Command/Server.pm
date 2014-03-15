@@ -2,9 +2,11 @@ package Prophet::CLI::Command::Server;
 use Moo;
 extends 'Prophet::CLI::Command';
 
+use Prophet::Types qw/InstanceOf Maybe/;
+
 has server => (
     is      => 'rw',
-    isa     => 'Maybe[Prophet::Server]',
+    isa     => Maybe [ InstanceOf ['Prophet::Server'] ],
     default => sub {
         my $self = shift;
         return $self->setup_server();
@@ -54,7 +56,6 @@ sub setup_server {
     }
     return $server;
 }
-
 
 1;
 

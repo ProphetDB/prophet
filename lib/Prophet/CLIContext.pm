@@ -4,7 +4,7 @@ use Types::Standard qw/ArrayRef HashRef InstanceOf Str/;
 
 has app_handle => (
     is       => 'rw',
-    isa      => InstanceOf['Prophet::App'],
+    isa      => InstanceOf ['Prophet::App'],
     lazy     => 1,
     handles  => [qw/handle resdb_handle config/],
     weak_ref => 1,
@@ -67,10 +67,9 @@ sub clear_props {
 }
 
 has prop_set => (
-    is         => 'rw',
-    isa        => ArrayRef,
-    default    => sub { [] },
-    auto_deref => 1,
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 sub add_to_prop_set {
@@ -310,6 +309,5 @@ sub set_id {
     $self->set_arg( id => $id );
     $self->set_uuid;
 }
-
 
 1;

@@ -3,42 +3,42 @@ use Moo;
 use Params::Validate;
 use Prophet::ConflictingPropChange;
 use Prophet::ConflictingChange;
+use Prophet::Types qw/Bool ArrayRef InstanceOf/;
 
 has prophet_handle => (
     is  => 'rw',
-    isa => 'Prophet::Replica',
+    isa => InstanceOf ['Prophet::Replica'],
 );
 
 has resolvers => (
-    is         => 'rw',
-    isa        => 'ArrayRef',
-    default    => sub { [] },
-    auto_deref => 1,
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 has changeset => (
     is  => 'rw',
-    isa => 'Prophet::ChangeSet',
+    isa => InstanceOf ['Prophet::ChangeSet'],
 );
 
 has nullification_changeset => (
     is  => 'rw',
-    isa => 'Prophet::ChangeSet',
+    isa => InstanceOf ['Prophet::ChangeSet'],
 );
 
 has resolution_changeset => (
     is  => 'rw',
-    isa => 'Prophet::ChangeSet',
+    isa => InstanceOf ['Prophet::ChangeSet'],
 );
 
 has autoresolved => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 has conflicting_changes => (
     is      => 'ro',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
@@ -120,7 +120,7 @@ that applying that changeset to the target replica would result in.
 
 sub generate_changeset_conflicts {
     my $self = shift;
-    for my $change ( $self->changeset->changes ) {
+    for my $change ( @{ $self->changeset->changes } ) {
         if ( my $change_conflicts =
             $self->_generate_change_conflicts($change) )
         {
@@ -297,7 +297,6 @@ sub generate_nullification_changeset {
 
     $self->nullification_changeset($nullification);
 }
-
 
 1;
 

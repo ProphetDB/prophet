@@ -1,43 +1,44 @@
 package Prophet::ConflictingChange;
 use Moo;
-use Prophet::Meta::Types;
 use Prophet::ConflictingPropChange;
 use JSON 'to_json';
 use Digest::SHA 'sha1_hex';
+use Prophet::Types
+  qw/ArrayRef Bool InstanceOf ProphetChangeType ProphetFileOpConflict Str/;
 
 has record_type => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 has record_uuid => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 has source_record_exists => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 has target_record_exists => (
     is  => 'rw',
-    isa => 'Bool',
+    isa => Bool,
 );
 
 has change_type => (
     is  => 'rw',
-    isa => 'Prophet::Type::ChangeType',
+    isa => ProphetChangeType,
 );
 
 has file_op_conflict => (
     is  => 'rw',
-    isa => 'Prophet::Type::FileOpConflict',
+    isa => ProphetFileOpConflict,
 );
 
 has prop_conflicts => (
     is      => 'rw',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
@@ -80,6 +81,5 @@ sub fingerprint {
 
     return sha1_hex( to_json( $struct, { utf8 => 1, canonical => 1 } ) );
 }
-
 
 1;

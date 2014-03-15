@@ -1,12 +1,14 @@
 package Prophet::CLI::Command::Mirror;
+
 use Moo;
 use Params::Validate qw/:all/;
+use Prophet::Types 'InstanceOf';
 
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::MirrorCommand';
 
-has source => ( isa => 'Prophet::Replica', is => 'rw');
-has target => ( isa => 'Prophet::Replica', is => 'rw');
+has source => ( isa => InstanceOf['Prophet::Replica'], is => 'rw');
+has target => ( isa => InstanceOf['Prophet::Replica'], is => 'rw');
 
 sub ARG_TRANSLATIONS { shift->SUPER::ARG_TRANSLATIONS(), f => 'force' }
 
@@ -49,6 +51,5 @@ sub validate_args {
         $self->print_usage;
     }
 }
-
 
 1;

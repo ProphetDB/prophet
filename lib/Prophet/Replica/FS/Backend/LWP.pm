@@ -1,13 +1,15 @@
 package Prophet::Replica::FS::Backend::LWP;
+
 use Moo;
 use Params::Validate qw/validate validate_pos/;
 use LWP::UserAgent;
+use Prophet::Types qw/InstanceOf Str/;
 
-has url => ( is => 'rw', isa => 'Str');
+has url => ( is => 'rw', isa => Str);
 
 has lwp_useragent => (
-    isa     => 'LWP::UserAgent',
-    is      => 'ro',
+    isa => InstanceOf ['LWP::UserAgent'],
+    is => 'ro',
     lazy    => 1,
     default => sub {
         my $ua = LWP::UserAgent->new(
@@ -74,6 +76,5 @@ sub can_write {
     0;
 
 }
-
 
 1;

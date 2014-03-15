@@ -1,6 +1,7 @@
 package Prophet::Server::ViewHelpers::Widget;
 
 use Template::Declare::Tags;
+use Prophet::Types qw/Bool InstanceOf Maybe Str/;
 
 BEGIN {
     delete ${ __PACKAGE__ . "::" }{meta};
@@ -10,21 +11,21 @@ BEGIN {
 use Moo;
 
 has function => (
-    isa => 'Prophet::Server::ViewHelpers::Function',
-    is  => 'ro'
+    isa => InstanceOf ['Prophet::Server::ViewHelpers::Function'],
+    is => 'ro'
 );
 
-has name => ( isa => 'Str', is => 'rw' );
+has name => ( isa => Str, is => 'rw' );
 
-has prop => ( isa => 'Str', is => 'ro' );
+has prop => ( isa => Str, is => 'ro' );
 
-has field => ( isa => 'Prophet::Web::Field', is => 'rw');
+has field => ( isa => InstanceOf['Prophet::Web::Field'], is => 'rw');
 
-has type => ( isa => 'Str|Undef', is => 'rw');
+has type => ( isa => Maybe[Str], is => 'rw');
 
-has autocomplete => (isa => 'Bool', is => 'rw', default => 1);
+has autocomplete => (isa => Bool, is => 'rw', default => 1);
 
-has default => ( isa => 'Str|Undef', is => 'rw');
+has default => ( isa => Maybe[Str], is => 'rw');
 
 sub render {
     my $self = shift;
@@ -108,7 +109,6 @@ sub _generate_name {
       . "-prop-"
       . $self->prop;
 }
-
 
 1;
 

@@ -1,15 +1,17 @@
 package Prophet::Web::FunctionResult;
-use Moo;
 
-has class => ( isa => 'Str', is => 'rw');
-has function_name => ( isa => 'Str', is => 'rw');
-has record_uuid => (isa => 'Str|Undef', is => 'rw');
-has success => (isa => 'Bool', is => 'rw');
-has message => (isa => 'Str', is => 'rw');
+use Moo;
+use Prophet::Types qw/Bool HashRef Maybe Str/;
+
+has class => ( isa => Str, is => 'rw');
+has function_name => ( isa => Str, is => 'rw');
+has record_uuid => (isa => Maybe[Str], is => 'rw');
+has success => (isa => Bool, is => 'rw');
+has message => (isa => Str, is => 'rw');
 
 has result => (
     is      => 'rw',
-    isa     => 'HashRef',
+    isa     => HashRef,
     default => sub { {} },
 );
 
@@ -17,6 +19,5 @@ sub exists { exists $_[0]->result->{ $_[1] } }
 sub items  { keys %{ $_[0]->result } }
 sub get    { $_[0]->result > { $_[1] } }
 sub set    { $_[0]->result->{ $_[1] } = $_[2] }
-
 
 1;

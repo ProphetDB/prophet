@@ -2,12 +2,13 @@ package Prophet::Server::Controller;
 use Moo;
 use Prophet::Util;
 use Prophet::Web::Result;
+use Prophet::Types qw/HashRef InstanceOf Str/;
 
-has cgi             => ( is => 'rw', isa => 'CGI' );
-has failure_message => ( is => 'rw', isa => 'Str' );
-has functions       => ( is => 'rw', isa => 'HashRef' );
-has app_handle      => ( is => 'rw', isa => 'Prophet::App' );
-has result          => ( is => 'ro', isa => 'Prophet::Web::Result' );
+has cgi             => ( is => 'rw', isa => InstanceOf['CGI'] );
+has failure_message => ( is => 'rw', isa => Str );
+has functions       => ( is => 'rw', isa => HashRef );
+has app_handle      => ( is => 'rw', isa => InstanceOf['Prophet::App'] );
+has result          => ( is => 'ro', isa => InstanceOf['Prophet::Web::Result'] );
 
 sub extract_functions_from_cgi {
     my $self = shift;
@@ -272,6 +273,5 @@ sub string_to_hash {
     my %attr = map { split( /=/, $_ ) } @bits;
     return \%attr;
 }
-
 
 1;

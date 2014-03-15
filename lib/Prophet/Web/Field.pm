@@ -1,15 +1,16 @@
 package Prophet::Web::Field;
 use Moo;
+use Prophet::Types qw/InstanceOf Maybe Str/;
 
-has name   => ( isa => 'Str',             is => 'rw' );
-has record => ( isa => 'Prophet::Record', is => 'rw' );
-has prop  => ( isa => 'Str',             is => 'rw' );
-has value  => ( isa => 'Str',             is => 'rw' );
-has label => ( isa => 'Str', is => 'rw', default => sub {''});
-has id    => ( isa => 'Str|Undef', is => 'rw' );
-has class => ( isa => 'Str|Undef', is => 'rw' );
-has value => ( isa => 'Str|Undef', is => 'rw' );
-has type => ( isa => 'Str|Undef', is => 'rw', default => 'text');
+has name   => ( is => 'rw', isa => Str );
+has record => ( is => 'rw', isa => InstanceOf['Prophet::Record'] );
+has prop   => ( is => 'rw', isa => Str);
+#has value  => ( is => 'rw', isa => Str );
+has label  => ( is => 'rw', isa => Str, default => sub {''});
+has id     => ( is => 'rw', isa => Maybe[Str] );
+has class  => ( is => 'rw', isa => Maybe[Str] );
+has value  => ( is => 'rw', isa => Maybe[Str] );
+has type   => ( is => 'rw', isa => Maybe[Str], default => 'text');
 
 sub _render_attr {
     my $self  = shift;
@@ -73,6 +74,5 @@ EOF
     }
 
 }
-
 
 1;

@@ -4,12 +4,12 @@ extends 'Path::Dispatcher::Rule::Regex';
 with 'Prophet::CLI::Dispatcher::Rule';
 
 use Prophet::CLIContext;
-use Types::Standard qw/RegexpRef Str/;
+use Prophet::Types qw/RegexpRef Str/;
 
 #has '+regex' => ( default => sub {qr/^$Prophet::CLIContext::ID_REGEX$/i} );
 has regex => (
-    is       => 'ro',
-    isa      => RegexpRef,
+    is      => 'ro',
+    isa     => RegexpRef,
     default => sub {qr/^$Prophet::CLIContext::ID_REGEX$/i}
 );
 
@@ -39,7 +39,6 @@ sub complete {
     }
     return @ids;
 }
-
 
 1;
 

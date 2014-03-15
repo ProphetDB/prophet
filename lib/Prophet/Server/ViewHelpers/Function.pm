@@ -1,6 +1,7 @@
 package Prophet::Server::ViewHelpers::Function;
 
 use Template::Declare::Tags;
+use Prophet::Types qw/Bool Enum InstanceOf Int Str/;
 
 BEGIN {
     delete ${ __PACKAGE__ . "::" }{meta};
@@ -8,38 +9,37 @@ BEGIN {
 }
 
 use Moo;
-use Any::Moose 'Util::TypeConstraints';
 
 has record => (
-    isa => 'Prophet::Record',
-    is  => 'ro'
-);
-
-has action => (
-    isa => ( enum [qw(create update delete)] ),
+    isa => InstanceOf ['Prophet::Record'],
     is => 'ro'
 );
 
-has order => ( isa => 'Int', is => 'ro' );
+has action => (
+    isa => ( Enum [qw(create update delete)] ),
+    is => 'ro'
+);
 
-has validate => ( isa => 'Bool', is => 'rw', default => 1);
-has canonicalize => ( isa => 'Bool', is => 'rw', default => 1);
-has execute => ( isa => 'Bool', is => 'rw', default => 1);
+has order => ( isa => Int, is => 'ro' );
+
+has validate => ( isa => Bool, is => 'rw', default => 1);
+has canonicalize => ( isa => Bool, is => 'rw', default => 1);
+has execute => ( isa => Bool, is => 'rw', default => 1);
 
 has name => (
-    isa => 'Str',
+    isa => Str,
     is  => 'rw',
 
     #regex    => qr/^(?:|[\w\d]+)$/,
 );
 
-sub new {
-    my $self = shift->SUPER::new(@_);
-    $self->name( ( $self->record->loaded ? $self->record->uuid : 'new' ) . "-"
-          . $self->action )
-      unless ( $self->name );
-    return $self;
-}
+# sub new {
+#     my $self = shift->SUPER::new(@_);
+#     $self->name( ( $self->record->loaded ? $self->record->uuid : 'new' ) . "-"
+#           . $self->action )
+#       unless ( $self->name );
+#     return $self;
+# }
 
 sub render {
     my $self = shift;

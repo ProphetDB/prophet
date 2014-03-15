@@ -1,11 +1,14 @@
 package Prophet::CLI::Command::Merge;
+
 use Moo;
+use Prophet::Types 'InstanceOf';
+
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::ProgressBar';
 with 'Prophet::CLI::MirrorCommand';
 
-has source => ( isa => 'Prophet::Replica', is => 'rw' );
-has target => ( isa => 'Prophet::Replica', is => 'rw' );
+has source => ( isa => InstanceOf['Prophet::Replica'], is => 'rw' );
+has target => ( isa => InstanceOf['Prophet::Replica'], is => 'rw' );
 
 sub ARG_TRANSLATIONS {
     shift->SUPER::ARG_TRANSLATIONS(),
@@ -216,7 +219,6 @@ sub merge_resolver {
       :                                  ();
     return $resolver;
 }
-
 
 1;
 

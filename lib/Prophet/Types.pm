@@ -10,4 +10,7 @@ BEGIN { extends qw/Types::Standard Types::Path::Tiny/ }
 declare 'ProphetChangeType',
   as enum( [qw/add_file add_dir update_file delete/] );
 
+declare 'ProphetFileOpConflict',
+  as enum( [qw/add_file add_dir update_file delete/] );
+
 1;

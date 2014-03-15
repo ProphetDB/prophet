@@ -1,16 +1,18 @@
 package Prophet::Test::Participant;
+
 use Moo;
 use Prophet::Test;
+use Prophet::Types qw/InstanceOf Str/;
 use Test::Exception;
 
 has name => (
     is  => 'rw',
-    isa => 'Str',
+    isa => Str,
 );
 
 has arena => (
     is       => 'rw',
-    isa      => 'Prophet::Test::Arena',
+    isa      => InstanceOf ['Prophet::Test::Arena'],
     weak_ref => 1,
 );
 
@@ -223,6 +225,5 @@ sub call_func {
 
     return ( $ret, $str, undef );
 }
-
 
 1;

@@ -1,9 +1,11 @@
 package Prophet::Server::Dispatcher;
 use Moo;
+use Prophet::Types 'InstanceOf';
+
 use Path::Dispatcher::Declarative -base,
   -default => { token_delimiter => '/', };
 
-has server => ( isa => 'Prophet::Server', is => 'rw', weak_ref => 1 );
+has server => ( isa => InstanceOf['Prophet::Server'], is => 'rw', weak_ref => 1 );
 
 under { method => 'POST' } => sub {
     on qr'.*' => sub {
@@ -98,6 +100,5 @@ under { method => 'GET' } => sub {
 };
 
 on qr'^(.*)$' => sub { shift->server->show_template($1) || next_rule; };
-
 
 1;

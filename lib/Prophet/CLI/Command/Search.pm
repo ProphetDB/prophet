@@ -1,15 +1,17 @@
 package Prophet::CLI::Command::Search;
+
 use Moo;
+use Prophet::Types 'CodeRef';
+
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 with 'Prophet::CLI::CollectionCommand';
 
 has '+uuid' => ( required => 0 );
 
-has 'sort_routine' => (
-    is       => 'rw',
-    isa      => 'CodeRef',
-    required => 0,
+has sort_routine => (
+    is  => 'rw',
+    isa => CodeRef,
 
     # default subs are executed immediately, hence the weird syntax for coderefs
     default => sub {
@@ -23,10 +25,9 @@ has 'sort_routine' => (
 );
 
 has group_routine => (
-    is       => 'rw',
-    isa      => 'CodeRef',
-    required => 0,
-    default  => sub {
+    is      => 'rw',
+    isa     => CodeRef,
+    default => sub {
         sub {
             my $records = shift;
             return [ { label => '', records => $records } ];
@@ -52,7 +53,7 @@ sub get_search_callback {
     my $self = shift;
 
     my %prop_checks;
-    for my $check ( $self->prop_set ) {
+    for my $check ( @{ $self->prop_set } ) {
         push @{ $prop_checks{ $check->{prop} } }, $check;
     }
 
@@ -143,9 +144,13 @@ sub display_terminal {
 
     my $groups = $self->group_routine->( [ $records->items ] );
 
+    use Data::Printer;
+    p $groups;
+
     foreach my $group ( @{$groups} ) {
         $self->out_group_heading( $group, $groups );
-        $self->out_record($_) for $self->sort_routine->( $group->{records} );
+        $self->out_record($_)
+          for @{ $self->sort_routine->( $group->{records} ) };
     }
 
 }
@@ -231,6 +236,5 @@ sub out_record {
     my $record = shift;
     print $record->format_summary . "\n";
 }
-
 
 1;

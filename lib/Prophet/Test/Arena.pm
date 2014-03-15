@@ -1,21 +1,22 @@
 package Prophet::Test::Arena;
+
 use Moo;
+use Prophet::Types qw/ArrayRef CodeRef/;
 
 has chickens => (
-    is         => 'rw',
-    isa        => 'ArrayRef',
-    default    => sub { [] },
-    auto_deref => 1,
+    is      => 'rw',
+    isa     => ArrayRef,
+    default => sub { [] },
 );
 
 has record_callback => (
     is  => 'rw',
-    isa => 'CodeRef',
+    isa => CodeRef,
 );
 
 has history => (
     is      => 'rw',
-    isa     => 'ArrayRef',
+    isa     => ArrayRef,
     default => sub { [] },
 );
 
@@ -185,6 +186,5 @@ sub record {
     # XXX: move to some kind of recorder class and make use of callback
     $self->add_history( [ $name, $action, $stored ] );
 }
-
 
 1;

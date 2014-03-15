@@ -10,6 +10,7 @@ use Prophet::Server::Dispatcher;
 use Prophet::Server::Controller;
 use Prophet::Web::Menu;
 use Prophet::Web::Result;
+use Prophet::Types qw/Bool InstanceOf Maybe Str/;
 
 use Params::Validate qw/:all/;
 use File::Spec ();
@@ -17,27 +18,16 @@ use Cwd        ();
 use JSON;
 use HTTP::Date;
 
-# Only define a class type constraint for CGI if it's not already defined,
-# because Moose doesn't auto-define class type constraints while Mouse does.
-unless ( find_type_constraint('CGI') ) {
-    use Any::Moose '::Util::TypeConstraints';
-    class_type('CGI');
-}
+with 'Prophet::Role::Common';
 
-has app_handle => (
-    isa     => 'Prophet::App',
-    is      => 'rw',
-    handles => [qw/handle/]
-);
-
-has cgi        => ( isa => 'CGI|Undef',                is  => 'rw' );
-has page_nav   => ( isa => 'Prophet::Web::Menu|Undef', is  => 'rw' );
-has read_only  => ( isa  => 'Bool',                        is => 'rw' );
-has static     => ( isa =>  'Bool',                        is => 'rw');
-has view_class => ( isa => 'Str',                       is  => 'rw' );
-has result     => ( isa => 'Prophet::Web::Result',      is  => 'rw' );
+has cgi        => ( is => 'rw', isa => Maybe[InstanceOf['CGI']]);
+has page_nav   => ( is => 'rw', isa => Maybe[InstanceOf['Prophet::Web::Menu']]);
+has read_only  => ( is => 'rw', isa  => Bool);
+has static     => ( is => 'rw', isa =>  Bool);
+has view_class => ( is => 'rw', isa => Str);
+has result     => ( is => 'rw', isa => InstanceOf['Prophet::Web::Result']);
 has port => (
-    isa     => 'Str',
+    isa     => Str,
     is      => 'rw',
     default => sub {
         my $self = shift;
@@ -508,6 +498,5 @@ sub make_link_relative {
     my $link = shift;
     return URI::file->new($link)->rel( "file://" . $self->cgi->path_info() );
 }
-
 
 1;

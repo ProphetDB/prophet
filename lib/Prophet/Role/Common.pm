@@ -12,6 +12,7 @@ has app_handle => (
     weak_ref  => 1,
     predicate => 1,
     required  => 1,
+    handles   => [qw/handle/],
 );
 
 1;

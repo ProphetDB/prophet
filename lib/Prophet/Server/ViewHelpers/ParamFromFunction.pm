@@ -1,6 +1,7 @@
 package Prophet::Server::ViewHelpers::ParamFromFunction;
 
 use Template::Declare::Tags;
+use Prophet::Types qw/Bool Enum InstanceOf Int Str/;
 
 BEGIN {
     delete ${ __PACKAGE__ . "::" }{meta};
@@ -8,18 +9,17 @@ BEGIN {
 }
 
 use Moo;
-use Any::Moose 'Util::TypeConstraints';
 
 has function => (
-    isa => 'Prophet::Server::ViewHelpers::Function',
-    is  => 'ro'
+    isa => InstanceOf ['Prophet::Server::ViewHelpers::Function'],
+    is => 'ro'
 );
 
-has name          => ( isa => 'Str',                 is => 'rw' );
-has prop          => ( isa => 'Str',                 is => 'ro' );
-has from_function => ( isa => 'Prophet::Server::ViewHelpers::Function',                 is => 'rw' );
-has from_result   => ( isa => 'Str',                 is => 'rw' );
-has field         => ( isa => 'Prophet::Web::Field', is => 'rw' );
+has name          => ( isa => Str,                 is => 'rw' );
+has prop          => ( isa => Str,                 is => 'ro' );
+has from_function => ( isa => InstanceOf['Prophet::Server::ViewHelpers::Function'],                 is => 'rw' );
+has from_result   => ( isa => Str,                 is => 'rw' );
+has field         => ( isa => InstanceOf['Prophet::Web::Field'], is => 'rw' );
 
 sub render {
     my $self = shift;
@@ -55,7 +55,6 @@ sub _generate_name {
       . "-prop-"
       . $self->prop;
 }
-
 
 1;
 

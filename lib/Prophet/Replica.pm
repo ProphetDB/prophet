@@ -16,13 +16,13 @@ with 'Prophet::Role::Common';
 
 has metadata_store => (
     is            => 'rw',
-    isa           => InstanceOf['Prophet::MetadataStore'],
+    isa           => InstanceOf ['Prophet::MetadataStore'],
     documentation => 'Where metadata about other replicas is stored.',
 );
 
 has resolution_db_handle => (
     is            => 'rw',
-    isa           => InstanceOf['Prophet::Replica'],
+    isa           => InstanceOf ['Prophet::Replica'],
     documentation => 'Where conflict resolutions are stored.',
 );
 
@@ -55,7 +55,7 @@ has after_initialize => (
 
 has uuid_generator => (
     is      => 'rw',
-    isa     => InstanceOf['Prophet::UUIDGenerator'],
+    isa     => InstanceOf ['Prophet::UUIDGenerator'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -966,7 +966,7 @@ sub integrate_changes {
         { isa => 'Prophet::Replica' },
         { isa => 'Prophet::ChangeSet' }
     );
-    $self->integrate_change( $_, $changeset ) for ( $changeset->changes );
+    $self->integrate_change( $_, $changeset ) for ( @{ $changeset->changes } );
 }
 
 =head2 integrate_change L<Prophet::Change> <Prophet::ChangeSet>

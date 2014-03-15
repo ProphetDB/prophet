@@ -1,6 +1,7 @@
 package Prophet::Server::ViewHelpers::HiddenParam;
 
 use Template::Declare::Tags;
+use Prophet::Types 'Str';
 
 BEGIN {
     delete ${ __PACKAGE__ . "::" }{meta};
@@ -11,9 +12,7 @@ use Moo;
 
 extends 'Prophet::Server::ViewHelpers::Widget';
 
-use Any::Moose 'Util::TypeConstraints';
-
-has value => ( isa => 'Str', is => 'rw');
+has value => ( isa => Str, is => 'rw');
 
 sub render {
     my $self = shift;

@@ -1,5 +1,7 @@
 package Prophet::CLI::Command::Create;
 use Moo;
+use Prophet::Types 'InstanceOf';
+
 extends 'Prophet::CLI::Command';
 with 'Prophet::CLI::RecordCommand';
 
@@ -7,7 +9,7 @@ has '+uuid' => ( required => 0 );
 
 has record => (
     is            => 'rw',
-    isa           => 'Prophet::Record',
+    isa           => InstanceOf ['Prophet::Record'],
     documentation => 'The record object of the created record.',
 );
 
@@ -42,7 +44,6 @@ sub run {
       . $record->luid . " ("
       . $record->uuid . ")" . "\n";
 }
-
 
 1;
 

@@ -3,8 +3,9 @@ package Prophet::Web::Menu;
 # ABSTRACT: Handle the API for menu navigation
 use Moo;
 use URI;
+use Prophet::Types qw/Bool InstanceOf Maybe Str/;
 
-has cgi => (isa =>'CGI', is=>'ro');
+has cgi => (isa => InstanceOf['CGI'], is=>'ro');
 
 =attr label [STRING]
 
@@ -12,7 +13,7 @@ Sets or returns the string that the menu item will be displayed as.
 
 =cut
 
-has label => ( isa => 'Str', is => 'rw');
+has label => ( isa => Str, is => 'rw');
 
 =attr parent [MENU]
 
@@ -21,7 +22,7 @@ null. This ensures that the reference is weakened.
 
 =cut
 
-has parent => ( isa => 'Prophet::Web::Menu|Undef', is => 'rw', weak_ref => 1);
+has parent => ( isa => Maybe[InstanceOf['Prophet::Web::Menu']], is => 'rw', weak_ref => 1);
 
 =attr sort_order [NUMBER]
 
@@ -30,9 +31,9 @@ parent.  This defaults to adding onto the end.
 
 =cut
 
-has sort_order => ( isa => 'Str', is => 'rw');
-has render_children_inline => ( isa => 'Bool', is => 'rw', default => 0);
-has url => ( isa => 'Str', is => 'bare');
+has sort_order => ( isa => Str, is => 'rw');
+has render_children_inline => ( isa => Bool, is => 'rw', default => 0);
+has url => ( isa => Str, is => 'bare');
 
 =attr target [STRING]
 
@@ -40,7 +41,7 @@ Get or set the frame or pseudo-target for this link. something like L<_blank>
 
 =cut
 
-has target => ( isa => 'Str', is => 'rw');
+has target => ( isa => Str, is => 'rw');
 
 =head2 class [STRING]
 
@@ -49,11 +50,11 @@ classes.  This is only used if C<link> isn't specified.
 
 =cut
 
-has class => ( isa => 'Str', is => 'rw');
-has escape_label => ( isa => 'Bool', is => 'rw');
+has class => ( isa => Str, is => 'rw');
+has escape_label => ( isa => Bool, is => 'rw');
 has server => (
-    isa      => 'Prophet::Server',
-    is       => 'ro',
+    isa => InstanceOf ['Prophet::Server'],
+    is => 'ro',
     weak_ref => 1,
 
 );

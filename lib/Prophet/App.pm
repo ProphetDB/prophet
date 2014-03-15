@@ -7,11 +7,11 @@ use File::Spec ();
 use Prophet::Config;
 use Prophet::UUIDGenerator;
 use Params::Validate qw/validate validate_pos/;
-use Types::Standard 'InstanceOf';
+use Prophet::Types 'InstanceOf';
 
 has handle => (
     is      => 'rw',
-    isa     => InstanceOf['Prophet::Replica'],
+    isa     => InstanceOf ['Prophet::Replica'],
     lazy    => 1,
     default => sub {
         my $self = shift;
@@ -35,7 +35,7 @@ has handle => (
 
 has config => (
     is      => 'rw',
-    isa     => InstanceOf['Prophet::Config'],
+    isa     => InstanceOf ['Prophet::Config'],
     default => sub {
         my $self = shift;
         return Prophet::Config->new(
@@ -259,6 +259,5 @@ sub display_name_for_replica {
     } keys %possibilities;
     return exists $sources_by_uuid{$uuid} ? $sources_by_uuid{$uuid} : $uuid;
 }
-
 
 1;

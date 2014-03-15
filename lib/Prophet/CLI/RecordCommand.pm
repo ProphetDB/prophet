@@ -2,24 +2,23 @@ package Prophet::CLI::RecordCommand;
 use Moo::Role;
 use Params::Validate;
 use Prophet::Record;
+use Prophet::Types qw/InstanceOf Str/;
 
 has type => (
     is        => 'rw',
-    isa       => 'Str',
-    required  => 0,
-    predicate => 'has_type',
+    isa       => Str,
+    predicate => 1,
 );
 
 has uuid => (
     is        => 'rw',
-    isa       => 'Str',
-    required  => 0,
-    predicate => 'has_uuid',
+    isa       => Str,
+    predicate => 1,
 );
 
 has record_class => (
     is  => 'rw',
-    isa => 'Prophet::Record',
+    isa => InstanceOf ['Prophet::Record'],
 );
 
 =method _get_record_object [{ type => 'type' }]
@@ -95,7 +94,6 @@ sub _type_to_record_class {
     return $try if ( $try->isa('Prophet::Record') );
     return 'Prophet::Record';
 }
-
 
 1;
 

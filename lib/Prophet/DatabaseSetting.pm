@@ -1,6 +1,7 @@
 package Prophet::DatabaseSetting;
 use Moo;
 extends 'Prophet::Record';
+use Prophet::Types qw/Maybe Str/;
 
 use Params::Validate;
 use JSON;
@@ -8,8 +9,8 @@ use JSON;
 has default => ( is => 'ro', );
 
 has label => (
-    isa => 'Str|Undef',
-    is  => 'rw',
+    isa => Maybe [Str],
+    is => 'rw',
 );
 
 has '+type' => ( default => '__prophet_db_settings' );
@@ -88,7 +89,6 @@ sub get {
     my $entry = from_json( $content, { utf8 => 1 } );
     return $entry;
 }
-
 
 1;
 
