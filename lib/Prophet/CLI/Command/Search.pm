@@ -1,5 +1,6 @@
 package Prophet::CLI::Command::Search;
 
+use v5.14.2;
 use Moo;
 use Prophet::Types 'CodeRef';
 
@@ -141,18 +142,13 @@ format.
 sub display_terminal {
     my $self    = shift;
     my $records = shift;
-
-    my $groups = $self->group_routine->( [ $records->items ] );
-
-    use Data::Printer;
-    p $groups;
+    my $groups  = $self->group_routine->( $records->items );
 
     foreach my $group ( @{$groups} ) {
         $self->out_group_heading( $group, $groups );
         $self->out_record($_)
-          for @{ $self->sort_routine->( $group->{records} ) };
+          for ( $self->sort_routine->( $group->{records} ) );
     }
-
 }
 
 =method sort_by_prop $prop, $records, $sort_undef_last
