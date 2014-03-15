@@ -159,10 +159,9 @@ sub as_string {
     my $self         = shift;
     my %args         = validate( @_, { header_callback => 0, } );
     my $out          = '';
-    my @prop_changes = $self->prop_changes;
+    my @prop_changes = @{ $self->prop_changes };
     return '' if @prop_changes == 0;
     $out .= $args{header_callback}->($self) if ( $args{header_callback} );
-
     for
       my $summary ( sort grep {defined} ( map { $_->summary } @prop_changes ) )
     {

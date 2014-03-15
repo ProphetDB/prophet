@@ -2,6 +2,7 @@ package Prophet::Record;
 
 # ABSTRACT: Base class for records.
 
+use v5.14.2;
 use Moo;
 use Carp 'confess';
 use Params::Validate;
@@ -12,8 +13,8 @@ use Types::Standard qw/InstanceOf Maybe Str/;
 use constant collection_class => 'Prophet::Collection';
 
 has app_handle => (
-    isa      => Maybe[InstanceOf['Prophet::App']],
-    is       => 'rw',
+    isa => Maybe [ InstanceOf ['Prophet::App'] ],
+    is => 'rw',
     required => 0,
 );
 
@@ -39,7 +40,7 @@ has uuid => (
 
 has luid => (
     is      => 'rw',
-    isa     => Maybe[Str],
+    isa     => Maybe [Str],
     lazy    => 1,
     default => sub { my $self = shift; $self->find_or_create_luid; },
 );
@@ -889,7 +890,7 @@ Returns this record's changesets as a single string.
 sub history_as_string {
     my $self = shift;
     my $out  = '';
-    for my $changeset ( $self->changesets ) {
+    foreach my $changeset ( $self->changesets ) {
         $out .= $changeset->as_string(
             change_filter => sub {
                 shift->record_uuid eq $self->uuid;
