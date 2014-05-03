@@ -1,4 +1,6 @@
 package Prophet::Replica::prophet;
+
+use v5.14.2;
 use Moo;
 extends 'Prophet::FilesystemReplica';
 
@@ -16,6 +18,7 @@ use Prophet::ContentAddressedStore;
 use Types::Standard qw/ArrayRef InstanceOf Int Maybe/;
 use JSON;
 use Digest::SHA qw(sha1_hex);
+use Types::Path::Tiny 'AbsPath';
 
 has '+db_uuid' => (
     lazy    => 1,
@@ -32,25 +35,21 @@ has _replica_version => (
 );
 
 has fs_root_parent => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
+    isa     => AbsPath,
+    coerce  => AbsPath->coercion,
     default => sub {
-        my $self = shift;
-        if ( $self->url =~ m{^file://(.*)} ) {
-            my $path = $1;
-            return File::Spec->catdir(
-                ( File::Spec->splitpath($path) )[ 0, -2 ] );
-        }
+        $_[0]->fs_root->parent;
     },
 );
 
 has fs_root => (
-    is      => 'rw',
+    is      => 'ro',
     lazy    => 1,
-    default => sub {
-        my $self = shift;
-        return $self->url =~ m{^file://(.*)$} ? $1 : undef;
-    },
+    isa     => AbsPath,
+    coerce  => AbsPath->coercion,
+    default => sub { return $_[0]->url =~ m{^file://(.*)$} ? $1 : die; }
 );
 
 has record_cas => (

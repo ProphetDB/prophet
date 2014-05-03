@@ -1,21 +1,21 @@
 package Prophet::Replica::FS::Backend::File;
+
+use v5.14.2;
 use Moo;
 use Fcntl qw/SEEK_END/;
 use Params::Validate qw/validate validate_pos/;
 use Types::Standard 'Str';
+use Types::Path::Tiny 'AbsPath';
 
 has url => ( is => 'rw', isa => Str);
-has fs_root => ( is => 'rw', isa => Str);
+has fs_root => ( is => 'rw', isa => AbsPath);
 
 sub read_file {
-    my $self   = shift;
-    my ($file) = (@_);    # validation is too heavy to be called here
-                          #my ($file) = validate_pos( @_, 1 );
-    return eval {
-        local $SIG{__DIE__} = 'DEFAULT';
-        Prophet::Util->slurp(
-            Prophet::Util->catfile( $self->fs_root => $file ) );
-    };
+    my $self = shift;
+    my ($file) = (@_);
+
+    my $full_path = $self->fs_root->child($file);
+    return $full_path->slurp_utf8;
 }
 
 sub read_file_range {
