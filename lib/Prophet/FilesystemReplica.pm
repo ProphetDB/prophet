@@ -1,4 +1,5 @@
 package Prophet::FilesystemReplica;
+
 use Moo;
 extends 'Prophet::Replica';
 use File::Spec;
@@ -15,7 +16,8 @@ false otherwise.
 
 sub replica_exists {
     my $self = shift;
-    return $self->uuid ? 1 : 0;
+    return unless -e $self->fs_root;
+    return $self->uuid;
 }
 
 sub can_initialize {
@@ -325,6 +327,5 @@ sub fetch_local_metadata {
       || $self->_read_file($sensitive_file);
 
 }
-
 
 1;
