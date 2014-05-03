@@ -4,8 +4,6 @@ package Prophet::Replica;
 
 use Moo;
 use Params::Validate qw(:all);
-use File::Spec ();
-use File::Path qw/mkpath/;
 use Types::Standard qw/Bool CodeRef InstanceOf Str/;
 
 use constant state_db_uuid => 'state';
@@ -129,7 +127,7 @@ sub initialize {
       if ( $args{db_uuid} );
 
     for ( $self->_on_initialize_create_paths ) {
-        mkpath( [ File::Spec->catdir( $self->fs_root => $_ ) ] );
+        $self->fs_root->child($_)->mkpath;
     }
 
     $self->initialize_backend(%args);
