@@ -121,7 +121,10 @@ sub initialize {
         }
     }
 
-    return if $self->replica_exists;
+    # TODO don't init an existing repo unless forced
+    if ( $self->replica_exists ) {
+        die 'This replica already exists.';
+    }
 
     $self->uuid_generator->set_uuid_scheme( $args{'db_uuid'} )
       if ( $args{db_uuid} );
