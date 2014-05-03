@@ -1,15 +1,23 @@
-use warnings;
-use strict;
-use Prophet::Test tests => 2;
+use Prophet::Test::Syntax;
 
-as_alice {
-    my $output = run_command(qw(init));
-    like( $output, qr/Initialized your new Prophet database/, 'init' );
-    ( undef, my $error ) = run_command(qw(init));
+with 'Prophet::Test';
+
+before setup => sub { $_[0]->as_alice };
+
+test 'init repo' => sub {
+    my $self = shift;
+
+    is(
+        exception { $self->app->handle->initialize },
+        undef, 'repo initialized',
+    );
+
     like(
-        $error,
-        qr/Your Prophet database already exists/,
-        'init existing replica'
+        exception { $self->app->handle->initialize },
+        qr/^This replica already exists/,
+        'repo NOT initialized, already exists',
     );
 };
 
+run_me;
+done_testing;

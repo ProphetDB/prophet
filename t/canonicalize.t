@@ -1,27 +1,22 @@
-use warnings;
-use strict;
-use Test::More tests => 7;
-use File::Temp qw'tempdir';
-use lib 't/lib';
+use Prophet::Test::Syntax;
+with 'Prophet::Test';
 
-use_ok('Prophet::CLI');
-$ENV{'PROPHET_REPO'} =
-  tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} ) . '/repo-' . $$;
-my $cli = Prophet::CLI->new();
-my $cxn = $cli->handle;
-isa_ok( $cxn, 'Prophet::Replica' );
+test canonicalize => sub {
+    my $self = shift;
+    my $cxn  = $self->cxn;
 
-$cxn->initialize;
+    use_ok 'TestApp::Bug';
 
-use_ok('TestApp::Bug');
+    my $record = TestApp::Bug->new( handle => $cxn );
 
-my $record = TestApp::Bug->new( handle => $cxn );
+    isa_ok $record, 'TestApp::Bug';
+    isa_ok $record, 'Prophet::Record';
 
-isa_ok( $record, 'TestApp::Bug' );
-isa_ok( $record, 'Prophet::Record' );
+    my $uuid = $record->create(
+        props => { name => 'Jesse', email => 'JeSsE@bestPractical.com' } );
+    ok $uuid;
+    is $record->prop('email'), 'jesse@bestpractical.com';
+};
 
-my $uuid = $record->create(
-    props => { name => 'Jesse', email => 'JeSsE@bestPractical.com' } );
-ok($uuid);
-is( $record->prop('email'), 'jesse@bestpractical.com' );
-
+run_me;
+done_testing;

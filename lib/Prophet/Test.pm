@@ -1,27 +1,36 @@
 package Prophet::Test;
-use strict;
-use warnings;
 
-use base qw/Test::More Exporter/;
-our @EXPORT = qw/as_alice as_bob as_charlie as_david as_user
-  repo_uri_for replica_last_rev replica_uuid_for ok_added_revisions replica_uuid
-  database_uuid database_uuid_for serialize_conflict serialize_changeset
-  in_gladiator diag run_command set_editor set_editor_script load_record
-  last_script_stdout last_script_stderr last_script_exit_code
-  /;
+use v5.14.2;
 
-use Cwd qw/getcwd/;
-use File::Path 'rmtree';
-use File::Spec;
-use File::Temp qw/tempdir tempfile/;
-use Params::Validate ':all';
-use Prophet::Util;
+use Test::Roo::Role;
+use Prophet::App;
 
-use Prophet::CLI;
+has app => (is => 'ro', default => sub { new_ok 'Prophet::App' } );
 
-our $REPO_BASE = File::Temp::tempdir();
-Test::More->import;
-diag("Replicas can be found in $REPO_BASE");
+has repo_base => (
+    is      => 'ro',
+    default => sub {
+        my $base = Path::Tiny->tempdir;
+
+        # CLEANUP => !$ENV{PROPHET_DEBUG}
+        diag "Replicas can be found in $base";
+        return $base;
+    },
+);
+
+has cxn => (is => 'lazy');
+
+sub _build_cxn {
+    my $self = shift;
+    my $cxn  = $self->app->handle;
+    isa_ok $cxn, 'Prophet::Replica', 'Got the cxn';
+    ok $cxn->initialize, 'Replica initialzed';
+    return $cxn;
+}
+
+before setup => sub {
+    $ENV{PROPHET_REPO} = $_[0]->repo_base->child("repo-$$");
+};
 
 # by default, load no configuration file
 $ENV{PROPHET_APP_CONFIG} = '';
@@ -126,14 +135,13 @@ Returns a path on disk for where $username's replica is stored.
 =cut
 
 sub repo_path_for {
-    my $username = shift;
-    return File::Spec->catdir( $REPO_BASE => $username );
+    my ( $self, $username ) = @_;
+    return $self->repo_base->child($username);
 }
 
 sub config_file_for {
-    my $username = shift;
-
-    return File::Spec->catdir( $REPO_BASE, $username, 'config' );
+    my ( $self, $username ) = @_;
+    return $self->repo_base->child( $username, 'config' );
 }
 
 =func repo_uri_for($username)
@@ -159,8 +167,9 @@ Returns the UUID of the test replica.
 
 sub replica_uuid {
     my $self = shift;
-    my $cli  = Prophet::CLI->new();
-    return $cli->handle->uuid;
+
+    # my $cli  = Prophet::CLI->new();
+    # return $cli->handle->uuid;
 }
 
 =func database_uuid
@@ -171,8 +180,9 @@ Returns the UUID of the test database.
 
 sub database_uuid {
     my $self = shift;
-    my $cli  = Prophet::CLI->new();
-    return eval { $cli->handle->db_uuid };
+
+    # my $cli  = Prophet::CLI->new();
+    # return eval { $cli->handle->db_uuid };
 }
 
 =func replica_last_rev
@@ -197,18 +207,16 @@ our %REPLICA_UUIDS;
 our %DATABASE_UUIDS;
 
 sub as_user {
-    my $username = shift;
-    my $coderef  = shift;
-    local $ENV{'PROPHET_REPO'}       = repo_path_for($username);
-    local $ENV{'PROPHET_EMAIL'}      = $username . '@example.com';
-    local $ENV{'PROPHET_APP_CONFIG'} = config_file_for($username);
+    my ( $self, $username ) = @_;
 
-    my $ret = $coderef->();
+    $ENV{PROPHET_REPO}       = $self->repo_path_for($username);
+    $ENV{PROPHET_EMAIL}      = $username . '@example.com';
+    $ENV{PROPHET_APP_CONFIG} = $self->config_file_for($username);
 
-    $REPLICA_UUIDS{$username}  = replica_uuid();
-    $DATABASE_UUIDS{$username} = database_uuid();
+    # $REPLICA_UUIDS{$username}  = replica_uuid;
+    # $DATABASE_UUIDS{$username} = database_uuid;
 
-    return $ret;
+    return;
 }
 
 =func replica_uuid_for($username)
@@ -253,18 +261,18 @@ sub ok_added_revisions (&$$) {
 Returns a simple, serialized version of a L<Prophet::Conflict> object suitable
 for comparison in tests.
 
-The serialized version is a hash reference containing the following keys:    
+The serialized version is a hash reference containing the following keys:
   meta => { original_source_uuid => 'source_replica_uuid' }
   records => {
       'record_uuid' => {
-          change_type => 'type',                   
+          change_type => 'type',
           props => {
               propchange_name => {
-                  source_old => 'old_val',                     
-                  source_new => 'new_val',                       
-                  target_old => 'target_val',                      
+                  source_old => 'old_val',
+                  source_new => 'new_val',
+                  target_old => 'target_val',
               }
-          }                 
+          }
       },
       another_record_uuid' => {
           change_type => 'type',
@@ -273,7 +281,7 @@ The serialized version is a hash reference containing the following keys:
                   source_old => 'old_val',
                   source_new => 'new_val',
                   target_old => 'target_val',
-              }             
+              }
           }
       },
   }
@@ -344,14 +352,15 @@ sub run_command {
 
     my $ret = eval {
         local $SIG{__DIE__} = 'DEFAULT';
-        $CLI_CLASS->new->run_one_command(@_);
+        $CLI_CLASS->new_with_cmd(@_);
     };
     warn $@ if $@;
 
     # restore to originals
     *STDOUT = $original_stdout;
     *STDERR = $original_stderr;
-
+    say $output;
+    say $error;
     return wantarray ? ( $output, $error ) : $output;
 }
 
@@ -383,10 +392,10 @@ Runs CODE as alice, bob, charlie or david.
 
 =cut
 
-sub as_alice (&)  { as_user( alice   => shift ) }
-sub as_bob (&)    { as_user( bob     => shift ) }
-sub as_charlie(&) { as_user( charlie => shift ) }
-sub as_david(&)   { as_user( david   => shift ) }
+sub as_alice   { $_[0]->as_user('alice') }
+sub as_bob     { as_user( bob => shift ) }
+sub as_charlie { as_user( charlie => shift ) }
+sub as_david   { as_user( david => shift ) }
 
 # END {
 #     for (qw(alice bob charlie david)) {
