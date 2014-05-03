@@ -2,35 +2,53 @@ package Prophet::App;
 
 # ABSTRACT: Main Prophet application module
 
+use v5.14.2;
 use Moo;
-use File::Spec ();
+
+use Path::Tiny;
 use Prophet::Config;
 use Prophet::UUIDGenerator;
 use Params::Validate qw/validate validate_pos/;
-use Prophet::Types 'InstanceOf';
+use Prophet::Types qw/InstanceOf Str/;
+use Prophet::Replica;
 
 has handle => (
-    is      => 'rw',
-    isa     => InstanceOf ['Prophet::Replica'],
+    is  => 'lazy',
+    isa => InstanceOf ['Prophet::Replica'],
+);
+
+sub _build_handle {
+    my $self = shift;
+
+    return Prophet::Replica->get_handle(
+        url        => $self->local_replica_url,
+        app_handle => $self,
+    );
+}
+
+=attr local_replica_url
+
+Returns the URL of the current local replica. Defaults to C<$ENV{PROPHET_REPO}>
+
+=cut
+
+has local_replica_url => (
+    is      => 'ro',
     lazy    => 1,
+    isa     => Str,
     default => sub {
-        my $self = shift;
-
-        if ( defined $self->local_replica_url
-            && $self->local_replica_url !~ /^[\w\+]{2,}\:/ )
-        {
-            # the reason why we need {2,} is to not match name on windows, e.g. C:\foo
-            my $path = $self->local_replica_url;
-            $path = File::Spec->rel2abs( glob($path) )
-              unless File::Spec->file_name_is_absolute($path);
-            $self->local_replica_url("file://$path");
-        }
-
-        return Prophet::Replica->get_handle(
-            url        => $self->local_replica_url,
-            app_handle => $self,
-        );
+        $ENV{PROPHET_REPO} if $ENV{PROPHET_REPO};
     },
+    coerce => sub {
+        my $path = shift;
+        if ( defined $path && $path !~ /^[\w\+]{2,}\:/ ) {
+
+            # the reason why we need {2,} is to not match name on windows, e.g. C:\foo
+            $path = path($path)->realpath;
+            say $path;
+            return "file://$path";
+        }
+    }
 );
 
 has config => (
@@ -57,22 +75,6 @@ Returns a string of the the default replica type for this application.
 sub default_replica_type {
     my $self = shift;
     return $ENV{'PROPHET_REPLICA_TYPE'} || DEFAULT_REPLICA_TYPE;
-}
-
-=method local_replica_url
-
-Returns the URL of the current local replica. If no URL has been provided
-(usually via C<$ENV{PROPHET_REPO}>), returns undef.
-
-=cut
-
-sub local_replica_url {
-    my $self = shift;
-    if (@_) {
-        $ENV{'PROPHET_REPO'} = shift;
-    }
-
-    return $ENV{'PROPHET_REPO'} || undef;
 }
 
 sub require {
