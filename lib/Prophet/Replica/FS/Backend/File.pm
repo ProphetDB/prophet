@@ -4,6 +4,7 @@ use v5.14.2;
 use Moo;
 use Fcntl qw/SEEK_END/;
 use Params::Validate qw/validate validate_pos/;
+use Try::Tiny;
 use Types::Standard 'Str';
 use Types::Path::Tiny 'AbsPath';
 
@@ -15,7 +16,14 @@ sub read_file {
     my ($file) = (@_);
 
     my $full_path = $self->fs_root->child($file);
-    return $full_path->slurp_utf8;
+
+    # TODO only return undef when a file is missing, throw on other errors
+    try {
+        return $full_path->slurp_raw;
+    }
+    catch {
+        return;
+    };
 }
 
 sub read_file_range {
