@@ -10,9 +10,7 @@ has app => (is => 'ro', default => sub { new_ok 'Prophet::App' } );
 has repo_base => (
     is      => 'ro',
     default => sub {
-        my $base = Path::Tiny->tempdir;
-
-        # CLEANUP => !$ENV{PROPHET_DEBUG}
+        my $base = Path::Tiny->tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} );
         diag "Replicas can be found in $base";
         return $base;
     },
