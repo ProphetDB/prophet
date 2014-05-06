@@ -1,28 +1,21 @@
-use warnings;
-use strict;
+use Prophet::Test::Syntax;
 
-use Test::More tests => 7;
-use File::Temp qw'tempdir';
-use lib 't/lib';
-use Test::Exception;
+with 'Prophet::Test';
 
-use_ok('Prophet::CLI');
-$ENV{'PROPHET_REPO'} =
-  tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} ) . '/repo-' . $$;
-my $cli = Prophet::CLI->new();
-my $cxn = $cli->handle;
-isa_ok( $cxn, 'Prophet::Replica', "Got the cxn" );
-use_ok('TestApp::Bug');
-$cxn->initialize;
-my $record = TestApp::Bug->new( handle => $cxn );
+test validate => sub {
+    my $self = shift;
+    use_ok 'TestApp::Bug';
+    my $record = new_ok 'TestApp::Bug' => [ handle => $self->cxn ];
 
-isa_ok( $record, 'TestApp::Bug' );
-isa_ok( $record, 'Prophet::Record' );
+    isa_ok $record, 'Prophet::Record';
 
-my $uuid = $record->create( props => { name => 'Jesse', age => 31 } );
-ok($uuid);
+    ok $record->create( props => { name => 'Jesse', age => 31 } );
 
-throws_ok {
-    $record->create( props => { name => 'Bob', age => 31 } );
-}
-qr/validation error/i;
+    like exception {
+        $record->create( props => { name => 'Bob', age => 31 } );
+    }, qr/validation error/i, 'Fails validation';
+
+};
+
+run_me;
+done_testing;
