@@ -1,65 +1,70 @@
-#!/usr/bin/perl -w
-use strict;
-use Prophet::Test::Arena;
+use Prophet::Test::Syntax;
 
-Prophet::Test::Arena->run_from_yaml;
+with 'Prophet::Test';
+
+TODO: {
+    todo_skip 'Update run_from_yaml', 1;
+    Prophet::Test::Arena->run_from_yaml;
+}
+
+done_testing;
 
 __DATA__
---- 
-chickens: 
+---
+chickens:
   - EIDOLON
   - KIRSLE
   - RZILAVEC
-recipe: 
-  - 
+recipe:
+  -
     - KIRSLE
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --the_Dark_Lord_of_Mordor
         - cr_r_a_a_ck
       result: 8
-  - 
+  -
     - RZILAVEC
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --the_Dark_Lord_of_Mordor
         - kapow
       result: 9
-  - 
+  -
     - EIDOLON
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --the_Shadow
         - eee_yow
       result: 10
-  - 
+  -
     - RZILAVEC
     - sync_from_peer
-    - 
+    -
       from: EIDOLON
-  - 
+  -
     - RZILAVEC
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --the_Lord_of_the_Earth
         - zamm
       result: 11
-  - 
+  -
     - KIRSLE
     - sync_from_peer
-    - 
+    -
       from: RZILAVEC
-  - 
+  -
     - EIDOLON
     - sync_from_peer
-    - 
+    -
       from: KIRSLE
-  - 
+  -
     - EIDOLON
     - sync_from_peer
-    - 
+    -
       from: RZILAVEC

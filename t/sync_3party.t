@@ -1,7 +1,13 @@
-use Prophet::Test;
-use Prophet::Test::Arena;
+use Prophet::Test::Syntax;
 
-Prophet::Test::Arena->run_from_yaml;
+with 'Prophet::Test';
+
+TODO: {
+    todo_skip 'Update run_from_yaml', 1;
+    Prophet::Test::Arena->run_from_yaml;
+}
+
+done_testing;
 
 __DATA__
 ---

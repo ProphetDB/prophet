@@ -1,37 +1,35 @@
-#!/usr/bin/perl -w
-use strict;
+use Prophet::Test::Syntax;
 
-BEGIN {
-    #$ENV{'PROPHET_REPLICA_TYPE'} = 'prophet';
+with 'Prophet::Test';
+
+TODO: {
+    todo_skip 'Update run_from_yaml', 1;
+    Prophet::Test::Arena->run_from_yaml;
 }
 
-use Prophet::Test::Arena;
-
-# "This test fails when your replica doesn't properly set original source metadata"
-
-Prophet::Test::Arena->run_from_yaml;
+done_testing;
 
 __DATA__
---- 
-chickens: 
+---
+chickens:
   - ALICE
   - BOB
-recipe: 
-  - 
+recipe:
+  -
     - ALICE
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --B
         - charlie
       result: 10
-  - 
+  -
     - BOB
     - sync_from_peer
-    - 
+    -
       from: ALICE
-  - 
+  -
     - ALICE
     - sync_from_peer
-    - 
+    -
       from: BOB

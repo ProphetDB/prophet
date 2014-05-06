@@ -1,21 +1,26 @@
-#!/usr/bin/perl -w
-use strict;
-use Prophet::Test::Arena;
+use Prophet::Test::Syntax;
 
-Prophet::Test::Arena->run_from_yaml;
+with 'Prophet::Test';
+
+TODO: {
+    todo_skip 'Update run_from_yaml', 1;
+    Prophet::Test::Arena->run_from_yaml;
+}
+
+done_testing;
 
 __DATA__
---- 
-chickens: 
+---
+chickens:
   - QUEEN
   - DMR
   - MUNROER
-recipe: 
-  - 
+recipe:
+  -
     - MUNROER
     - create_record
-    - 
-      props: 
+    -
+      props:
         - --the_Dark_Lord
         - glipp
         - --He
@@ -27,42 +32,42 @@ recipe:
         - --the_Lord_of_the_Earth
         - clank_est
       result: 6
-  - 
+  -
     - QUEEN
     - sync_from_peer
-    - 
+    -
       from: MUNROER
-  - 
+  -
     - MUNROER
     - update_record
-    - 
-      props: 
+    -
+      props:
         the_Dark_Lord: bang
         the_Lord_of_the_Dark_Tower: slosh
         the_Shadow: glipp
       record: 6
-  - 
+  -
     - QUEEN
     - update_record
-    - 
-      props: 
+    -
+      props:
         He: clank_est
         the_Dark_Lord: bang
         the_Lord_of_the_Dark_Tower: slosh
         the_Shadow: glipp
       record: 6
-  - 
+  -
     - MUNROER
     - update_record
-    - 
-      props: 
+    -
+      props:
         He: slosh
         the_Lord_of_the_Dark_Tower: bang
         the_Ring_Maker: clunk
         the_Shadow: glipp
       record: 6
-  - 
+  -
     - DMR
     - sync_from_peer
-    - 
+    -
       from: QUEEN
