@@ -119,43 +119,6 @@ sub repo_uri_for {
     return 'file://' . $path;
 }
 
-=func replica_uuid
-
-Returns the UUID of the test replica.
-
-=cut
-
-sub replica_uuid {
-    my $self = shift;
-
-    # my $cli  = Prophet::CLI->new();
-    # return $cli->handle->uuid;
-}
-
-=func database_uuid
-
-Returns the UUID of the test database.
-
-=cut
-
-sub database_uuid {
-    my $self = shift;
-
-    # my $cli  = Prophet::CLI->new();
-    # return eval { $cli->handle->db_uuid };
-}
-
-=func replica_last_rev
-
-Returns the sequence number of the last change in the test replica.
-
-=cut
-
-sub replica_last_rev {
-    my $cli = Prophet::CLI->new();
-    return $cli->handle->latest_sequence_no;
-}
-
 =func as_user($username, $coderef)
 
 Run this code block as $username.  This routine sets up the %ENV hash so that
@@ -281,47 +244,6 @@ sub serialize_changeset {
     my ($cs) = validate_pos( @_, { isa => 'Prophet::ChangeSet' } );
 
     return $cs->as_hash;
-}
-
-=func run_command($command, @args)
-
-Run the given command with (optionally) the given args using a new
-L<Prophet::CLI> object. Returns the standard output of that command in scalar
-form or, in array context, the STDOUT in scalar form *and* the STDERR in scalar
-form.
-
-Examples:
-
-    run_command('create', '--type=Foo');
-
-=cut
-
-our $CLI_CLASS = 'Prophet::CLI';
-
-sub run_command {
-    my $output = '';
-    my $error  = '';
-
-    my $original_stdout = *STDOUT;
-    my $original_stderr = *STDERR;
-    open( my $out_handle, '>', \$output );
-    open( my $err_handle, '>', \$error );
-    *STDOUT = $out_handle;
-    *STDERR = $err_handle;
-    $|++;    # autoflush
-
-    my $ret = eval {
-        local $SIG{__DIE__} = 'DEFAULT';
-        $CLI_CLASS->new_with_cmd(@_);
-    };
-    warn $@ if $@;
-
-    # restore to originals
-    *STDOUT = $original_stdout;
-    *STDERR = $original_stderr;
-    say $output;
-    say $error;
-    return wantarray ? ( $output, $error ) : $output;
 }
 
 =func load_record($type, $uuid)
