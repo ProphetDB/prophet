@@ -4,6 +4,7 @@ use v5.14.2;
 
 use Test::Roo::Role;
 use Prophet::App;
+use Prophet::Record;
 
 has app => (is => 'ro', default => sub { new_ok 'Prophet::App' } );
 
@@ -86,6 +87,52 @@ sub in_gladiator (&) {
     }
     map { $types->{$_} || delete $types->{$_} } keys %$types;
 
+}
+
+=method C<create_record(Str $type, HashRef $props)>
+
+Creates a record of type $type, and returns the UUID.
+
+=cut
+
+sub create_record {
+    my ( $self, $type, $props ) = @_;
+
+    $props = {} unless $props;
+
+    my $record =
+      new_ok 'Prophet::Record' => [ handle => $self->cxn, type => $type ];
+
+    ok my $uuid = $record->create( props => $props ), 'created a record';
+    return $uuid;
+}
+
+=method load_record(Str $type, Str $uuid)
+
+Loads and returns a record object for the record with the given type and uuid.
+
+=cut
+
+sub load_record {
+    my ( $self, $type, $uuid, $cxn ) = @_;
+
+    $cxn ||= $self->cxn;
+    my $record = Prophet::Record->new( handle => $cxn, type => $type );
+    $record->load( uuid => $uuid );
+    return $record;
+}
+
+=method C<create_record(Str $type, HashRef $props)>
+
+Creates a record of type $type, and returns the UUID.
+
+=cut
+
+sub update_record {
+    my ( $self, $type, $uuid, $props ) = @_;
+    my $record = $self->load_record( $type, $uuid );
+    ok $record->set_props( props => $props ), 'updated a record';
+    return;
 }
 
 =func repo_path_for($username)
@@ -244,23 +291,6 @@ sub serialize_changeset {
     my ($cs) = validate_pos( @_, { isa => 'Prophet::ChangeSet' } );
 
     return $cs->as_hash;
-}
-
-=func load_record($type, $uuid)
-
-Loads and returns a record object for the record with the given type and uuid.
-
-=cut
-
-sub load_record {
-    my ( $self, $type, $uuid, $cxn ) = @_;
-
-    require Prophet::Record;
-
-    $cxn ||= $self->cxn;
-    my $record = Prophet::Record->new( handle => $cxn, type => $type );
-    $record->load( uuid => $uuid );
-    return $record;
 }
 
 =func as_alice CODE, as_bob CODE, as_charlie CODE, as_david CODE
