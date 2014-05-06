@@ -1,39 +1,37 @@
-use warnings;
-use strict;
-use Test::More tests => 9;
-use File::Temp qw'tempdir';
-use lib 't/lib';
+use Prophet::Test::Syntax;
 
-use_ok('Prophet::CLI');
-$ENV{'PROPHET_REPO'} =
-  tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} ) . '/repo-' . $$;
-my $cli = Prophet::CLI->new();
-my $cxn = $cli->handle;
-$cxn->initialize;
-isa_ok( $cxn, 'Prophet::Replica' );
+with 'Prophet::Test';
 
-use_ok('TestApp::Bug');
+test default => sub {
+    my $self = shift;
+    my $cxn  = $self->cxn;
 
-my $record = TestApp::Bug->new( handle => $cxn );
+    use_ok 'TestApp::Bug';
 
-isa_ok( $record, 'TestApp::Bug' );
-isa_ok( $record, 'Prophet::Record' );
+    my $record = TestApp::Bug->new( handle => $cxn );
 
-my $uuid = $record->create(
-    props => { name => 'Jesse', email => 'JeSsE@bestPractical.com' } );
-ok($uuid);
-is( $record->prop('status'), 'new', "default status" );
+    isa_ok $record, 'TestApp::Bug';
+    isa_ok $record, 'Prophet::Record';
 
-my $closed_record = TestApp::Bug->new( handle => $cxn );
+    my $uuid = $record->create(
+        props => { name => 'Jesse', email => 'JeSsE@bestPractical.com' } );
+    ok $uuid;
+    is $record->prop('status'), 'new', 'default status';
 
-$uuid = $closed_record->create(
-    props => {
-        name   => 'Jesse',
-        email  => 'JeSsE@bestPractical.com',
-        status => 'closed'
-    }
-);
-ok($uuid);
-is( $closed_record->prop('status'), 'closed',
-    "default status is overridable" );
+    my $closed_record = TestApp::Bug->new( handle => $cxn );
 
+    $uuid = $closed_record->create(
+        props => {
+            name   => 'Jesse',
+            email  => 'JeSsE@bestPractical.com',
+            status => 'closed'
+        }
+    );
+    ok $uuid;
+    is $closed_record->prop('status'), 'closed',
+      'default status is overridable';
+
+};
+
+run_me;
+done_testing;
