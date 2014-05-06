@@ -1,15 +1,18 @@
-use Prophet::Test tests => 6;
+use Prophet::Test::Syntax;
 
-as_alice {
-    my $cli = Prophet::CLI->new();
-    $cli->handle->initialize;
+with 'Prophet::Test';
 
-    ok( $cli->handle->store_local_metadata( foo => 'bar' ) );
-    is( $cli->handle->fetch_local_metadata('Foo'), 'bar' );
-    ok( $cli->handle->store_local_metadata( Foo => 'bartwo' ) );
-    is( $cli->handle->fetch_local_metadata('foo'), 'bartwo' );
-    ok( $cli->handle->store_local_metadata( foo => 'barTwo' ) );
-    is( $cli->handle->fetch_local_metadata('foo'), 'barTwo' );
+test 'local metadata' => sub {
+    my $self = shift;
+
+    ok $self->app->handle->store_local_metadata( foo => 'bar' );
+    is $self->app->handle->fetch_local_metadata('Foo'), 'bar';
+    ok $self->app->handle->store_local_metadata( Foo => 'bartwo' );
+    is $self->app->handle->fetch_local_metadata('foo'), 'bartwo';
+    ok $self->app->handle->store_local_metadata( foo => 'barTwo' );
+    is $self->app->handle->fetch_local_metadata('foo'), 'barTwo';
 
 };
 
+run_me;
+done_testing;
