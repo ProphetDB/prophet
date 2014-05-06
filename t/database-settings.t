@@ -3,10 +3,7 @@ use Moo;
 extends 'Prophet::Record';
 use Prophet::DatabaseSetting;
 
-sub new {
-    shift->SUPER::new( type => 'task', @_ );
-}
-use constant type => 'task';
+has '+type' => ( default => 'task' );
 
 sub status_list {
     my $self = shift;
@@ -33,178 +30,171 @@ sub default_component {
 }
 
 package main;
-use warnings;
-use strict;
+use Prophet::Test::Syntax;
 
-use Prophet::Test 'no_plan';
+with 'Prophet::Test';
 
-my ( $alice_cli, $bob_cli );
+test 'as alice' => sub {
+    my $self = shift;
 
-as_alice {
-
-    #create a repo
-    $alice_cli = Prophet::CLI->new();
-    my $cxn = $alice_cli->handle;
-    isa_ok( $cxn, 'Prophet::Replica', "Got the cxn " . $cxn->fs_root );
-    $cxn->initialize();
-
-    # set up an app model class, "ticket"
-    my $t =
-      MyApp::Model::Task->new( handle => $alice_cli->app_handle->handle );
+    # set up an app model class, "ticket"*
+    my $t = new_ok 'MyApp::Model::Task' => [ handle => $self->cxn ];
 
     # set default values for status
-    my $status_list = $t->status_list;
+    ok my $status_list = $t->status_list;
 
-    my $comp_list    = $t->component_list;
-    my $default_comp = $t->default_component;
+    ok my $comp_list    = $t->component_list;
+    ok my $default_comp = $t->default_component;
 
-    isa_ok( $status_list, 'Prophet::DatabaseSetting' );
+    isa_ok $status_list, 'Prophet::DatabaseSetting';
 
-    can_ok( $status_list, 'set' );
-    can_ok( $status_list, 'get' );
+    can_ok $status_list, 'set';
+    can_ok $status_list, 'get';
 
     # set list of acceptable components
-    $comp_list->set( [qw/core ui docs/] );
+    ok $comp_list->set( [qw/core ui docs/] );
 
     # set default values for component
-    $default_comp->set('core');
+    ok $default_comp->set('core');
 
     # set list of acceptable statuses
-    $status_list->set( 'new', 'open', 'closed' );
+    ok $status_list->set( 'new', 'open', 'closed' );
 
     # enumerate statuses
-    is_deeply( $status_list->get, [qw/new open closed/] );
-    exit;
+    is_deeply $status_list->get, [qw/new open closed/];
 
-    $status_list->set( 'new', 'closed' );
+    ok $status_list->set( 'new', 'closed' );
 
-    is_deeply( $status_list->get, [qw/new closed/] );
+    is_deeply $status_list->get, [qw/new closed/];
 
     # enumerate components
-    is_deeply( $t->component_list->get, [qw/core ui docs/] );
+    is_deeply $t->component_list->get, [qw/core ui docs/];
 
     # enumerate default component
-    is_deeply( $t->default_component->get,
-        ['core'], "The thing we got was core" );
+    is_deeply $t->default_component->get, ['core'],
+      'The thing we got was core';
 
     # just for good measure, create a ticket
-    ok( run_command(qw(create --type Bug -- --status new --from alice )),
-        'Created a record as alice' );
-    run_output_matches( 'prophet', [qw(search --type Bug --regex .)],
-        [qr/new/], [], " Found our record" );
+    ok $t->create(
+        props => { type => 'Bug', status => 'new', from => 'alice' } ),
+      'Created a record as alice';
+
+    # run_output_matches( 'prophet', [qw(search --type Bug --regex .)],
+    #     [qr/new/], [], " Found our record" );
 
 };
 
-as_bob {
-    $bob_cli = Prophet::CLI->new();
-    my $cxn = $bob_cli->handle;
-    isa_ok( $cxn, 'Prophet::Replica', "Got the cxn " . $cxn->fs_root );
+# as_bob {
+#     $bob_cli = Prophet::CLI->new();
+#     my $cxn = $bob_cli->handle;
+#     isa_ok( $cxn, 'Prophet::Replica', "Got the cxn " . $cxn->fs_root );
 
-    # pull from alice
-    run_ok(
-        'prophet',
-        [
-            'clone', '--from',
-            "file://" . $alice_cli->app_handle->handle->fs_root,
-            '--as', 'alice'
-        ]
-    );
-    run_ok(
-        'prophet',
-        [qw(create --type Bug -- --status open --from bob )],
-        "Created a record as bob"
-    );
-    run_output_matches( 'prophet', [qw(search --type Bug --regex open)],
-        [qr/open/], [], "Found our record" );
+#     # pull from alice
+#     run_ok(
+#         'prophet',
+#         [
+#             'clone', '--from',
+#             "file://" . $alice_cli->app_handle->handle->fs_root,
+#             '--as', 'alice'
+#         ]
+#     );
+#     run_ok(
+#         'prophet',
+#         [qw(create --type Bug -- --status open --from bob )],
+#         "Created a record as bob"
+#     );
+#     run_output_matches( 'prophet', [qw(search --type Bug --regex open)],
+#         [qr/open/], [], "Found our record" );
 
-    my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
+#     my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
 
-    # enumerate statuses
-    is_deeply( $t->status_list->get, [qw/new closed/] );
+#     # enumerate statuses
+#     is_deeply( $t->status_list->get, [qw/new closed/] );
 
-    # enumerate components
-    is_deeply( $t->component_list->get, [qw/core ui docs/] );
+#     # enumerate components
+#     is_deeply( $t->component_list->get, [qw/core ui docs/] );
 
-    # enumerate default component
-    is_deeply( $t->default_component->get,
-        ['core'], "The thing we got was core" );
+#     # enumerate default component
+#     is_deeply( $t->default_component->get,
+#         ['core'], "The thing we got was core" );
 
-    $t->default_component->set('ui');
+#     $t->default_component->set('ui');
 
-    is_deeply( $t->default_component->get,
-        ['ui'], "The thing we got was core" );
-};
+#     is_deeply( $t->default_component->get,
+#         ['ui'], "The thing we got was core" );
+# };
 
-as_alice {
-    $alice_cli = Prophet::CLI->new();
-    my $cxn = $alice_cli->handle;
-    isa_ok( $cxn, 'Prophet::Replica', "Got the cxn " . $cxn->fs_root );
+# as_alice {
+#     $alice_cli = Prophet::CLI->new();
+#     my $cxn = $alice_cli->handle;
+#     isa_ok( $cxn, 'Prophet::Replica', "Got the cxn " . $cxn->fs_root );
 
-    my $t =
-      MyApp::Model::Task->new( handle => $alice_cli->app_handle->handle );
-    is_deeply( $t->default_component->get,
-        ['core'], "The thing we got was core" );
-    run_ok(
-        'prophet',
-        [
-            'pull',                                            '--from',
-            "file://" . $bob_cli->app_handle->handle->fs_root, '--force'
-        ]
-    );
-    is_deeply( $t->default_component->get,
-        ['ui'], "The thing we got was core" );
+#     my $t =
+#       MyApp::Model::Task->new( handle => $alice_cli->app_handle->handle );
+#     is_deeply( $t->default_component->get,
+#         ['core'], "The thing we got was core" );
+#     run_ok(
+#         'prophet',
+#         [
+#             'pull',                                            '--from',
+#             "file://" . $bob_cli->app_handle->handle->fs_root, '--force'
+#         ]
+#     );
+#     is_deeply( $t->default_component->get,
+#         ['ui'], "The thing we got was core" );
 
-    #   add a status
-    $t->status_list->set(qw/new open stalled resolved/);
+#     #   add a status
+#     $t->status_list->set(qw/new open stalled resolved/);
 
-};
+# };
 
-as_bob {
-    my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
-    $t->status_list->set(qw/new open resolved rejected/);
+# as_bob {
+#     my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
+#     $t->status_list->set(qw/new open resolved rejected/);
 
-};
+# };
 
-as_bob {
+# as_bob {
 
-    #   pull from alice
-    #run_ok( 'prophet', ['pull', '--from', "file://".$alice_cli->app_handle->handle->fs_root, '--force', '--prefer', 'to'] );
-    run_ok( 'prophet',
-        [ 'pull', '--from', 'alice', '--force', '--prefer', 'to' ] );
+#     #   pull from alice
+#     #run_ok( 'prophet', ['pull', '--from', "file://".$alice_cli->app_handle->handle->fs_root, '--force', '--prefer', 'to'] );
+#     run_ok( 'prophet',
+#         [ 'pull', '--from', 'alice', '--force', '--prefer', 'to' ] );
 
-    # enumerate statuses
-    my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
-  TODO: {
-        local $TODO = "we don't resolve config conflicts yet";
-        is_deeply( $t->status_list->get,
-            [qw[new open stalled resolved rejected]] );
-    }
+#     # enumerate statuses
+#     my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
+#   TODO: {
+#         local $TODO = "we don't resolve config conflicts yet";
+#         is_deeply( $t->status_list->get,
+#             [qw[new open stalled resolved rejected]] );
+#     }
 
-    # current behaviour
-    is_deeply( $t->status_list->get, [qw[new open resolved rejected]] );
-};
+#     # current behaviour
+#     is_deeply( $t->status_list->get, [qw[new open resolved rejected]] );
+# };
 
-as_alice {
+# as_alice {
 
-    #    pull from bob
-    run_ok(
-        'prophet',
-        [
-            'pull',                                            '--from',
-            "file://" . $bob_cli->app_handle->handle->fs_root, '--force'
-        ]
-    );
+#     #    pull from bob
+#     run_ok(
+#         'prophet',
+#         [
+#             'pull',                                            '--from',
+#             "file://" . $bob_cli->app_handle->handle->fs_root, '--force'
+#         ]
+#     );
 
-    # enumerate statuses
-    my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
-  TODO: {
-        local $TODO = "we don't resolve config conflicts yet";
-        is_deeply( $t->status_list->get,
-            [qw[new open stalled resolved rejected]] );
-    }
+#     # enumerate statuses
+#     my $t = MyApp::Model::Task->new( handle => $bob_cli->app_handle->handle );
+#   TODO: {
+#         local $TODO = "we don't resolve config conflicts yet";
+#         is_deeply( $t->status_list->get,
+#             [qw[new open stalled resolved rejected]] );
+#     }
 
-    # current behaviour
-    is_deeply( $t->status_list->get, [qw[new open resolved rejected]] );
-};
+#     # current behaviour
+#     is_deeply( $t->status_list->get, [qw[new open resolved rejected]] );
+# };
 
-1;
+run_me;
+done_testing;
