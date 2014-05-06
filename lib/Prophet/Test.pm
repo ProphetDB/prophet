@@ -362,26 +362,21 @@ sub run_command {
     return wantarray ? ( $output, $error ) : $output;
 }
 
-{
-
 =func load_record($type, $uuid)
 
 Loads and returns a record object for the record with the given type and uuid.
 
 =cut
 
-    my $connection;
+sub load_record {
+    my ( $self, $type, $uuid, $cxn ) = @_;
 
-    sub load_record {
-        my $type = shift;
-        my $uuid = shift;
-        require Prophet::Record;
-        $connection ||= Prophet::CLI->new->handle;
-        my $record =
-          Prophet::Record->new( handle => $connection, type => $type );
-        $record->load( uuid => $uuid );
-        return $record;
-    }
+    require Prophet::Record;
+
+    $cxn ||= $self->cxn;
+    my $record = Prophet::Record->new( handle => $cxn, type => $type );
+    $record->load( uuid => $uuid );
+    return $record;
 }
 
 =func as_alice CODE, as_bob CODE, as_charlie CODE, as_david CODE
