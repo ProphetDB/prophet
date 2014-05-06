@@ -9,27 +9,27 @@ extends 'App::Record';
 sub type {'foo'}
 
 package main;
-use warnings;
-use strict;
-use File::Temp qw/tempdir/;
-$ENV{'PROPHET_REPO'} =
-  tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} ) . '/repo-' . $$;
+use Prophet::Test::Syntax;
+with 'Prophet::Test';
 
-use Prophet::Test tests => 8;
-use Test::Exception;
+test history => sub {
+    my $self = shift;
+    $self->cxn;
 
-my $cli = Prophet::CLI->new();
+    my $rec =
+      App::Record::Thingy->new( handle => $self->app->handle, type => 'foo' );
 
-$cli->handle->initialize;
+    ok $rec->create( props => { foo => 'bar', point => '123' } );
+    is $rec->prop('foo'),   'bar';
+    is $rec->prop('point'), '123';
+    ok $rec->set_props( props => { foo => 'abc' } );
+    is $rec->prop('foo'), 'abc';
+    ok $rec->set_props( props => { foo => 'def' } );
+    is $rec->prop('foo'), 'def';
 
-my $rec = App::Record::Thingy->new( handle => $cli->handle, type => 'foo' );
+    my @history = $rec->changesets;
+    is scalar @history, 3;
+};
 
-ok( $rec->create( props => { foo => 'bar', point => '123' } ) );
-is( $rec->prop('foo'),   'bar' );
-is( $rec->prop('point'), '123' );
-ok( $rec->set_props( props => { foo => 'abc' } ) );
-is( $rec->prop('foo'), 'abc' );
-ok( $rec->set_props( props => { foo => 'def' } ) );
-is( $rec->prop('foo'), 'def' );
-my @history = $rec->changesets();
-is( scalar @history, 3 );
+run_me;
+done_testing;
