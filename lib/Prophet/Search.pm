@@ -1,14 +1,30 @@
-package Prophet::CLI::Command::Search;
+package Prophet::Search;
 
 use v5.14.2;
 use Moo;
-use Prophet::Types 'CodeRef';
+use Carp;
+with 'Prophet::Role::Common';
 
-extends 'Prophet::CLI::Command';
-with 'Prophet::CLI::RecordCommand';
-with 'Prophet::CLI::CollectionCommand';
+use Prophet::Types qw/ArrayRef CodeRef HashRef RegexpRef Str/;
+use Params::Validate;
 
-has '+uuid' => ( required => 0 );
+has props => (
+    is      => 'rw',
+    isa     => HashRef,
+    default => sub { {} },
+);
+
+has type => ( is => 'ro', isa => Str);
+
+has regex => (
+    is      => 'ro',
+    isa     => RegexpRef,
+    coerce => sub {
+        if (!ref $_[0]) {
+            return qr/$_[0]/;
+        }
+    },
+);
 
 has sort_routine => (
     is  => 'rw',
@@ -38,50 +54,103 @@ has group_routine => (
       'A subroutine which takes an arrayref to a list of records and returns an array of hashrefs  { label => $label, records => \@array}'
 );
 
-sub usage_msg {
-    my $self = shift;
-    my ( $cmd, $type_and_subcmd ) = $self->get_cmd_and_subcmd_names;
+=method _get_record_object [{ type => 'type' }]
 
-    return <<"END_USAGE";
-usage: ${cmd}${type_and_subcmd}
-       ${cmd}${type_and_subcmd} -- prop1=~foo prop2!~bar|baz
-END_USAGE
+Tries to determine a record class from either the given type argument or the
+current object's C<$type> attribute.
+
+Returns a new instance of the record class on success, or throws a fatal error
+with a stack trace on failure.
+
+=cut
+
+sub _get_record_object {
+    my $self = shift;
+    my %args = validate( @_, { type => { default => $self->type }, } );
+
+    my $constructor_args = {
+        app_handle => $self->app_handle,
+        handle     => $self->handle,
+        type       => $args{type},
+    };
+
+    if ( $args{type} ) {
+        my $class = $self->_type_to_record_class( $args{type} );
+        return $class->new($constructor_args);
+    } elsif ( my $class = $self->record_class ) {
+        Prophet::App->require($class);
+        return $class->new($constructor_args);
+    } else {
+        $self->fatal_error(
+            "I couldn't find that record. (You didn't specify a record type.)"
+        );
+    }
+}
+
+=method _type_to_record_class $type
+
+Takes a type and tries to figure out a record class name from it. Returns
+C<'Prophet::Record'> if no better class name is found.
+
+=cut
+
+sub _type_to_record_class {
+    my $self = shift;
+
+    my $try = $self->app_handle->app_class . "::Model::" . ucfirst( lc($self->type) );
+    Prophet::App->try_to_require($try);    # don't care about fails
+    return $try if ( $try->isa('Prophet::Record') );
+
+    $try = $self->app_handle->app_class . "::Record";
+    Prophet::App->try_to_require($try);    # don't care about fails
+    return $try if ( $try->isa('Prophet::Record') );
+    return 'Prophet::Record';
 }
 
 sub default_match {1}
 
+sub get_collection_object {
+    my $self = shift;
+    my %args = validate( @_, { type => { default => $self->type }, } );
+
+    my $class =
+      $self->_get_record_object( type => $args{type} )->collection_class;
+    Prophet::App->require($class);
+
+    my $records = $class->new(
+        app_handle => $self->app_handle,
+        handle     => $self->handle,
+        type       => $args{type} || $self->type,
+    );
+
+    return $records;
+}
+
 sub get_search_callback {
     my $self = shift;
-
-    my %prop_checks;
-    for my $check ( @{ $self->prop_set } ) {
-        push @{ $prop_checks{ $check->{prop} } }, $check;
-    }
-
-    my $regex = $self->arg('regex');
 
     return sub {
         my $item      = shift;
         my $props     = $item->get_props;
         my $did_limit = 0;
 
-        if ( $self->prop_names > 0 ) {
+        if ( keys %{$self->props} > 0 ) {
             $did_limit = 1;
-
-            for my $prop ( keys %prop_checks ) {
-                my $got = $props->{$prop};
+            for my $prop ( keys %{$self->props} ) {
                 my $ok  = 0;
-                for my $check ( @{ $prop_checks{$prop} } ) {
-                    $ok = 1
-                      if $self->_compare( $check->{value}, $check->{cmp},
-                        $got );
+
+                if (exists $props->{$prop}) {
+                        if ($props->{$prop} eq $self->props->{$prop}) {
+                            $ok = 1;
+                        }
                 }
                 return 0 if !$ok;
             }
         }
 
         # if they specify a regex, it must match
-        if ($regex) {
+        if ($self->regex) {
+            my $regex = $self->regex;
             $did_limit = 1;
             my $ok = 0;
 
@@ -100,10 +169,12 @@ sub get_search_callback {
     };
 }
 
+# TODO don't use a cmp prop, try to autodetermine comparator like smartmatch
 sub _compare {
     my $self = shift;
     my ( $expected, $cmp, $got ) = @_;
 
+    $cmp = '' if !defined($cmp);
     $got = '' if !defined($got);    # avoid undef warnings
 
     if ( $cmp eq '=' ) {
@@ -114,6 +185,8 @@ sub _compare {
         return 0 if $got eq $expected;
     } elsif ( $cmp eq '!~' ) {
         return 0 if $got =~ $expected;
+    } else {
+        return 0 if $got eq $expected;
     }
 
     return 1;
@@ -122,33 +195,11 @@ sub _compare {
 sub run {
     my $self = shift;
 
-    $self->print_usage if $self->has_arg('h');
-
-    my $records   = $self->get_collection_object();
-    my $search_cb = $self->get_search_callback();
+    my $records   = $self->get_collection_object;
+    my $search_cb = $self->get_search_callback;
     $records->matching($search_cb);
 
-    $self->display_terminal($records);
-}
-
-=method display_terminal $records
-
-Takes a collection of records, sorts it according to C<$sort_routine>, and then
-prints it to standard output using L<Prophet::Record->format_summary> as the
-format.
-
-=cut
-
-sub display_terminal {
-    my $self    = shift;
-    my $records = shift;
-    my $groups  = $self->group_routine->( $records->items );
-
-    foreach my $group ( @{$groups} ) {
-        $self->out_group_heading( $group, $groups );
-        $self->out_record($_)
-          for ( $self->sort_routine->( $group->{records} ) );
-    }
+    return $records;
 }
 
 =method sort_by_prop $prop, $records, $sort_undef_last

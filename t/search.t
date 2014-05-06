@@ -1,122 +1,123 @@
-#!/usr/bin/env perl
-use strict;
-use warnings;
-use Prophet::Test tests => 18;
-use Prophet::Util;
+use Prophet::Test::Syntax;
 
-use_ok('Prophet::CLI::Command::Search');
+with 'Prophet::Test';
 
-as_alice {
-    ok( run_command('init'), 'created a db as alice' );
-    ok(
-        run_command(
-            qw(create --type=Bug --),
-            'summary=first ticket summary',
-            'status=new',
-        ),
-        'created a record as alice'
-    );
-    ok(
-        run_command(
-            qw(create --type=Bug --),
-            'summary=other ticket summary',
-            'status=open'
-        ),
-        'created a record as alice'
-    );
-    ok(
-        run_command(
-            qw(create --type=Bug --), 'summary=bad ticket summary',
-            'status=stalled',         'cmp=ne',
-        ),
-        'created a record as alice'
-    );
+test search => sub {
+    my $self = shift;
 
-    my $out      = run_command(qw(search --type Bug --regex .));
-    my $expected = qr/.*first ticket summary.*
-.*other ticket summary.*
-.*bad ticket summary.*
-/;
-    like( $out, $expected, 'Found our records' );
+    $self->create_record('Bug', {
+        summary=>'first ticket summary',
+        status=>'new',
+    });
 
-    $out      = run_command(qw(ls --type Bug -- status=new));
-    $expected = qr/.*first ticket summary.*/;
-    like( $out, $expected, 'found the only ticket with status=new' );
-    $out      = run_command(qw(search --type Bug -- status=open));
-    $expected = qr/.*other ticket summary.*/;
-    like( $out, $expected, 'found the only ticket with status=open' );
+    $self->create_record('Bug', {
+        summary=>'other ticket summary',
+        status=>'new',
+    });
 
-    $out      = run_command(qw(search --type Bug -- status=closed));
-    $expected = '';
-    is( $out, $expected, 'found no tickets with status=closed' );
+    $self->create_record('Bug', {
+        summary=>'bad ticket summary',
+        status=>'stalled',
+        cmp => 'ne',
+    });
 
-    $out      = run_command(qw(search --type Bug -- status=new status=open));
-    $expected = qr/.*first ticket summary.*
-.*other ticket summary.*
-/;
-    like( $out, $expected,
-        'found two tickets with status=new OR status=open' );
+    use_ok 'Prophet::Search';
 
-    $out      = run_command(qw(search --type Bug -- status!=new));
-    $expected = qr/.*other ticket summary.*
-.*bad ticket summary.*
-/;
-    like( $out, $expected, 'found two tickets with status!=new' );
+    # search for any tickets by regex
+    my $search = new_ok 'Prophet::Search' => [app_handle => $self->app, type => 'Bug', regex => '.'];
+    my $results = $search->run;
+    isa_ok $results, 'Prophet::Collection';
+    isa_ok $results->items, 'ARRAY';
+    is scalar @{$results->items}, 3, '3 results returned';
 
-    $out      = run_command(qw(search --type Bug -- status=~n));
-    $expected = qr/.*first ticket summary.*
-.*other ticket summary.*
-/;
-    like( $out, $expected, 'found two tickets with status=~n' );
+    # search for status new
+    $search = new_ok 'Prophet::Search' => [
+        app_handle => $self->app,
+        type => 'Bug',
+        props => { status => 'new' },
+    ];
 
-    $out      = run_command(qw(search --type Bug -- summary=~first|bad));
-    $expected = qr/.*first ticket summary.*
-.*bad ticket summary.*
-/;
-    like( $out, $expected, 'found two tickets with status=~first|stalled' );
+    $results = $search->run;
+    isa_ok $results, 'Prophet::Collection';
+    isa_ok $results->items, 'ARRAY';
+    is scalar @{$results->items}, 2, '2 results returned';
 
-    $out =
-      run_command(qw(search --type Bug -- status !=new summary=~first|bad));
-    $expected = qr/bad ticket summary/;
-    like( $out, $expected, 'found two tickets with status=~first|bad' );
+    # search for status open
+    $search = new_ok 'Prophet::Search' => [
+        app_handle => $self->app,
+        type => 'Bug',
+        props => { status => 'open' },
+    ];
 
-    $out =
-      run_command(qw(search --type Bug -- status ne new summary =~ first|bad));
-    $expected = qr/bad ticket summary/;
-    like( $out, $expected, 'found two tickets with status=~first|bad' );
+    $results = $search->run;
+    isa_ok $results, 'Prophet::Collection';
+    isa_ok $results->items, 'ARRAY';
+    is scalar @{$results->items}, 0, '0 results returned';
 
-    $out      = run_command(qw(search --type Bug -- cmp ne));
-    $expected = qr/bad ticket summary/;
-    like(
-        $out,
-        $expected,
-        "found the ticket with cmp=ne (which didn't treat 'ne' as a comparator)",
-    );
 
-    $out      = run_command(qw(search --type Bug --regex=new -- status=~n));
-    $expected = qr/first ticket summary/;
-    like( $out, $expected,
-        'found a ticket with regex and props working together' );
+    # search for status closed
+    $search = new_ok 'Prophet::Search' => [
+        app_handle => $self->app,
+        type => 'Bug',
+        props => { status => 'closed' },
+    ];
 
-    my $broken_config_content = <<'END_CONFIG';
-[Bug]
-    summary-format = %,status
-END_CONFIG
-    Prophet::Util->write_file(
-        file    => $ENV{PROPHET_APP_CONFIG},
-        content => $broken_config_content
-    );
-    my $expected_error =
-      qr/Error: cannot format value 'new' using atom '%' in 'Bug' summary format
+    $results = $search->run;
+    isa_ok $results, 'Prophet::Collection';
+    isa_ok $results->items, 'ARRAY';
+    is scalar @{$results->items}, 0, '0 results returned';
 
-Check that the Bug.summary-format config variable in your config
-file is valid. If this variable is not set, this is a bug in the default
-summary format for this ticket type.
+    # search for status open or new
+    $search = new_ok 'Prophet::Search' => [
+        app_handle => $self->app,
+        type => 'Bug',
+        props => { status => 'closed' },
+    ];
 
-The error encountered was:
+    $results = $search->run;
+    isa_ok $results, 'Prophet::Collection';
+    isa_ok $results->items, 'ARRAY';
+    is scalar @{$results->items}, 0, '0 results returned';
 
-'Invalid conversion in sprintf: end of string at/;
-    my ( undef, $error ) = run_command(qw(search --type Bug --regex .));
-    like( $error, $expected_error, 'error on bad format atom' );
+#     like( $out, $expected, 'found two tickets with status!=new' );
+
+#     $out      = run_command(qw(search --type Bug -- status=~n));
+#     $expected = qr/.*first ticket summary.*
+# .*other ticket summary.*
+# /;
+#     like( $out, $expected, 'found two tickets with status=~n' );
+
+#     $out      = run_command(qw(search --type Bug -- summary=~first|bad));
+#     $expected = qr/.*first ticket summary.*
+# .*bad ticket summary.*
+# /;
+#     like( $out, $expected, 'found two tickets with status=~first|stalled' );
+
+#     $out =
+#       run_command(qw(search --type Bug -- status !=new summary=~first|bad));
+#     $expected = qr/bad ticket summary/;
+#     like( $out, $expected, 'found two tickets with status=~first|bad' );
+
+#     $out =
+#       run_command(qw(search --type Bug -- status ne new summary =~ first|bad));
+#     $expected = qr/bad ticket summary/;
+#     like( $out, $expected, 'found two tickets with status=~first|bad' );
+
+#     $out      = run_command(qw(search --type Bug -- cmp ne));
+#     $expected = qr/bad ticket summary/;
+#     like(
+#         $out,
+#         $expected,
+#         "found the ticket with cmp=ne (which didn't treat 'ne' as a comparator)",
+#     );
+
+#     $out      = run_command(qw(search --type Bug --regex=new -- status=~n));
+#     $expected = qr/first ticket summary/;
+#     like( $out, $expected,
+#         'found a ticket with regex and props working together' );
+
 };
+
+run_me;
+done_testing;
 
