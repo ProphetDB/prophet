@@ -1,57 +1,50 @@
-use warnings;
-use strict;
-use Test::More tests => 7;
-use lib 't/lib';
+use Prophet::Test::Syntax;
 
-use File::Temp qw'tempdir';
+with 'Prophet::Test';
 
 # test coverage for Prophet::Record references (subs register_reference,
 # register_collection_reference, and register_record_reference)
 
-use_ok('Prophet::CLI');
-$ENV{'PROPHET_REPO'} =
-  tempdir( CLEANUP => !$ENV{PROPHET_DEBUG} ) . '/repo-' . $$;
+test references => sub {
+    my $self = shift;
 
-my $cli = Prophet::CLI->new();
-my $cxn = $cli->handle;
-my $app = $cli->app_handle;
-isa_ok( $cxn, 'Prophet::Replica', "Got the cxn" );
+    use_ok 'TestApp::ButterflyNet';
+    my $net = new_ok 'TestApp::ButterflyNet' => [ handle => $self->cxn ];
+    ok $net->create( props => { catches => 'butterflies' } );
 
-$cxn->initialize;
+    use_ok 'TestApp::BugCatcher';
+    my $bugcatcher = new_ok 'TestApp::BugCatcher' =>
+      [ app_handle => $self->app, handle => $self->cxn ];
+    ok $bugcatcher->create( props => { net => $net->uuid, name => 'Larry' } );
 
-use_ok('TestApp::ButterflyNet');
-my $net = TestApp::ButterflyNet->new( handle => $cxn );
-$net->create( props => { catches => 'butterflies' } );
+    use_ok 'TestApp::Bug';
+    my $monarch = new_ok 'TestApp::Bug' => [ handle => $self->cxn ];
+    ok $monarch->create(
+        props => {
+            bugcatcher => $bugcatcher->uuid,
+            species    => 'monarch'
+        }
+    );
 
-use_ok('TestApp::BugCatcher');
-my $bugcatcher =
-  TestApp::BugCatcher->new( app_handle => $app, handle => $cxn );
-$bugcatcher->create( props => { net => $net->uuid, name => 'Larry' } );
+    my $viceroy = new_ok 'TestApp::Bug' => [ handle => $self->cxn ];
+    ok $viceroy->create(
+        props => {
+            bugcatcher => $bugcatcher->uuid,
+            species    => 'viceroy'
+        }
+    );
 
-use_ok('TestApp::Bug');
-my $monarch = TestApp::Bug->new( handle => $cxn );
-$monarch->create(
-    props => {
-        bugcatcher => $bugcatcher->uuid,
-        species    => 'monarch'
-    }
-);
-my $viceroy = TestApp::Bug->new( handle => $cxn );
-$viceroy->create(
-    props => {
-        bugcatcher => $bugcatcher->uuid,
-        species    => 'viceroy'
-    }
-);
+    # test collection reference
+    my @got = map { $_->uuid }
+      sort { $a->uuid cmp $b->uuid } @{ $bugcatcher->bugs };
 
-# test collection reference
-my @got = map { $_->uuid }
-  sort { $a->uuid cmp $b->uuid } @{ $bugcatcher->bugs };
+    my @expected = map { $_->uuid }
+      sort { $a->uuid cmp $b->uuid } ( $monarch, $viceroy );
 
-my @expected = map { $_->uuid }
-  sort { $a->uuid cmp $b->uuid } ( $monarch, $viceroy );
+    is_deeply \@got, \@expected, "collection's record uuids match";
 
-is_deeply( \@got, \@expected, "collection's record uuids match" );
+    is $bugcatcher->net->uuid, $net->uuid, 'record references match';
+};
 
-# test record reference
-is( $bugcatcher->net->uuid, $net->uuid );
+run_me;
+done_testing;
