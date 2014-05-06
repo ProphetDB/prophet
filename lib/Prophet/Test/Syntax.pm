@@ -4,6 +4,7 @@ use v5.14.2;
 use Syntax::Collector -collect => q{
    use feature 0 ':5.14';
    use autodie 2.21;
+   use Class::Load 0 'try_load_class';
    use Path::Tiny 0;
    use Test::Roo 1.000;
    use Test::Fatal 0.012;
