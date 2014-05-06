@@ -43,44 +43,6 @@ $ENV{PROPHET_APP_CONFIG} = '';
     }
 }
 
-our $EDIT_TEXT = sub {shift};
-do {
-    no warnings 'redefine';
-    *Prophet::CLI::Command::edit_text = sub {
-        my $self = shift;
-        $EDIT_TEXT->(@_);
-    };
-};
-
-=func set_editor($code)
-
-Sets the subroutine that Prophet should use instead of
-C<Prophet::CLI::Command::edit_text> (as this routine invokes an interactive
-editor) to $code.
-
-=cut
-
-sub set_editor {
-    $EDIT_TEXT = shift;
-}
-
-=func set_editor_script SCRIPT
-
-Sets the editor that Proc::InvokeEditor uses.
-
-This should be a non-interactive script found in F<t/scripts>.
-
-=cut
-
-sub set_editor_script {
-    my ( $self, $script ) = @_;
-
-    delete $ENV{'VISUAL'};    # Proc::InvokeEditor checks this first
-    $ENV{'EDITOR'} =
-      "$^X " . Prophet::Util->catfile( getcwd(), 't', 'scripts', $script );
-    Test::More::diag "export EDITOR=" . $ENV{'EDITOR'} . "\n";
-}
-
 sub import_extra {
     my $class = shift;
     my $args  = shift;
@@ -386,7 +348,7 @@ Runs CODE as alice, bob, charlie or david.
 =cut
 
 sub as_alice   { $_[0]->as_user('alice') }
-sub as_bob     { as_user( bob => shift ) }
+sub as_bob     { $_[0]->as_user('bob') }
 sub as_charlie { as_user( charlie => shift ) }
 sub as_david   { as_user( david => shift ) }
 
