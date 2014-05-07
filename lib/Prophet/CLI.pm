@@ -12,12 +12,6 @@ use List::Util 'first';
 use Text::ParseWords qw(shellwords);
 use Types::Standard qw/Bool ClassName InstanceOf/;
 
-has app_class => (
-    is      => 'rw',
-    isa     => ClassName,
-    default => 'Prophet::App',
-);
-
 =attr dispatcher_class -> Class
 
 Returns class name of the dispatcher used to dispatch command lines. By default
@@ -51,7 +45,7 @@ has record_class => (
 
 has app_handle => (
     is      => 'rw',
-    isa     => InstanceOf['Prophet::App'],
+    isa     => InstanceOf ['Prophet::App'],
     lazy    => 1,
     handles => [qw/handle config/],
     default => sub {
@@ -61,7 +55,7 @@ has app_handle => (
 
 has context => (
     is      => 'rw',
-    isa     => InstanceOf['Prophet::CLIContext'],
+    isa     => InstanceOf ['Prophet::CLIContext'],
     lazy    => 1,
     default => sub {
         return Prophet::CLIContext->new( app_handle => shift->app_handle );
@@ -233,7 +227,6 @@ sub get_script_name {
 END {
     *STDOUT = $ORIGINAL_STDOUT if $ORIGINAL_STDOUT;
 }
-
 
 1;
 

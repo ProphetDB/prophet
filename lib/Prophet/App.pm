@@ -9,8 +9,14 @@ use Path::Tiny;
 use Prophet::Config;
 use Prophet::UUIDGenerator;
 use Params::Validate qw/validate validate_pos/;
-use Prophet::Types qw/InstanceOf Str/;
+use Prophet::Types qw/ClassName InstanceOf Str/;
 use Prophet::Replica;
+
+has app_class => (
+    is      => 'rw',
+    isa     => ClassName,
+    default => 'Prophet::App',
+);
 
 has handle => (
     is  => 'lazy',
