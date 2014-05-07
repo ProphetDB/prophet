@@ -1,10 +1,8 @@
-# #!/usr/bin/perl
+use Prophet::Test::Syntax;
 
-# use warnings;
-# use strict;
-# use Test::Exception;
+with 'Prophet::Test';
 
-# use Prophet::Test tests => 18;
+plan skip_all => 'Temporarily disabled';
 
 # as_alice {
 #     run_command(qw(init));

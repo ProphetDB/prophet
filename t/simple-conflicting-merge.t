@@ -1,10 +1,8 @@
-# #!/usr/bin/perl
-# #
-# use warnings;
-# use strict;
+use Prophet::Test::Syntax;
 
-# use Prophet::Test tests => 17;
-# use Test::Exception;
+with 'Prophet::Test';
+
+plan skip_all => 'Temporarily disabled';
 
 # use_ok('Prophet::Replica');
 

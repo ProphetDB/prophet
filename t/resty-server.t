@@ -8,9 +8,11 @@
 # }
 
 # package main;
-# use Prophet::Test::Syntax;
+use Prophet::Test::Syntax;
 
-# with 'Prophet::Test';
+with 'Prophet::Test';
+
+plan skip_all => 'Temporarily disabled';
 # use JSON;
 
 # sub BUILD {

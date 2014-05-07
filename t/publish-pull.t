@@ -1,7 +1,8 @@
-# #!/usr/bin/perl
-# use warnings;
-# use strict;
-# use Prophet::Test tests => 33;
+use Prophet::Test::Syntax;
+with 'Prophet::Test';
+
+plan skip_all => 'Temporarily disabled';
+
 # use File::Temp qw(tempdir tempfile);
 # use Params::Validate;
 # use Prophet::Util;

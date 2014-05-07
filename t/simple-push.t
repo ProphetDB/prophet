@@ -1,10 +1,8 @@
-# #!/usr/bin/perl
-# #
-# use warnings;
-# use strict;
+use Prophet::Test::Syntax;
 
-# use Prophet::Test tests => 17;
+with 'Prophet::Test';
 
+plan skip_all => 'Temporarily disabled';
 # as_alice {
 #     ok( run_command(qw(init)), 'replica init' );
 #     ok( run_command(qw(create --type Bug -- --status new-alice --from alice )),
