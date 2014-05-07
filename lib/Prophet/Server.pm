@@ -1,16 +1,12 @@
 package Prophet::Server;
 use Moo;
 
-# this instead of extends silences "You inherit from non-Mouse class" warning
-use base 'HTTP::Server::Simple::CGI';
-
-use Prophet::Server::Controller;
-use Prophet::Server::View;
-use Prophet::Server::Dispatcher;
-use Prophet::Server::Controller;
-use Prophet::Web::Menu;
-use Prophet::Web::Result;
-use Prophet::Types qw/Bool InstanceOf Maybe Str/;
+# use Prophet::Server::Controller;
+# use Prophet::Server::View;
+# use Prophet::Server::Dispatcher;
+# use Prophet::Server::Controller;
+use Plack::Request;
+use Prophet::Types qw/Bool CodeRef InstanceOf Int/;
 
 use Params::Validate qw/:all/;
 use File::Spec ();
@@ -20,14 +16,11 @@ use HTTP::Date;
 
 with 'Prophet::Role::Common';
 
-has cgi        => ( is => 'rw', isa => Maybe[InstanceOf['CGI']]);
-has page_nav   => ( is => 'rw', isa => Maybe[InstanceOf['Prophet::Web::Menu']]);
+has psgi       => ( is => 'lazy', isa => CodeRef);
 has read_only  => ( is => 'rw', isa  => Bool);
-has static     => ( is => 'rw', isa =>  Bool);
-has view_class => ( is => 'rw', isa => Str);
 has result     => ( is => 'rw', isa => InstanceOf['Prophet::Web::Result']);
 has port => (
-    isa     => Str,
+    isa     => Int,
     is      => 'rw',
     default => sub {
         my $self = shift;
@@ -36,18 +29,31 @@ has port => (
     }
 );
 
+sub _build_psgi {
+    my $self = shift;
+    my $psgi = sub {
+        my $env = shift;
+        my $req = Plack::Request->new($env);
+
+        my $res = $self->handle_request($req);
+
+        if ( ref $res ne 'Plack::Response' ) {
+            $res = $req->new_response(500);
+        }
+
+        $res->header( 'Server' => __PACKAGE__ );
+        return $res->finalize;
+    };
+
+    return $psgi;
+}
+
 sub run {
     my $self      = shift;
     my $publisher = eval {
         require Net::Rendezvous::Publish;
         Net::Rendezvous::Publish->new;
     };
-
-    eval { require Template::Declare }
-      || die
-      "Without Template::Declare installed, Prophet's Web UI won't work";
-    eval { require File::ShareDir }
-      || die "Without File::ShareDir installed, Prophet's Web UI won't work";
 
     if ($publisher) {
         $publisher->publish(
@@ -61,10 +67,12 @@ sub run {
                 "Publisher backend is not available. Install one of the "
               . "Net::Rendezvous::Publish::Backend modules from CPAN." );
     }
-    $self->setup_template_roots();
+
     print ref($self)
       . ": Starting up local server. You can stop the server with Ctrl-c.\n";
+
     eval { $self->SUPER::run(@_); };
+
     if ($@) {
         if ( $@ =~ m/^bind to \*:(\d+): Address already in use/ ) {
             die
@@ -86,163 +94,31 @@ sub database_bonjour_name {
     return $self->handle->db_uuid;
 }
 
-sub setup_template_roots {
-    my $self       = shift;
-    my $view_class = ref( $self->app_handle ) . "::Server::View";
-
-    if ( Prophet::App->try_to_require($view_class) ) {
-        $self->view_class($view_class);
-    } else {
-        $self->view_class('Prophet::Server::View');
-    }
-
-    Template::Declare->init( roots => [ $self->view_class ] );
-}
-
-our $PROPHET_STATIC_ROOT;
-
-sub prophet_static_root {
-    my $self = shift;
-    unless ($PROPHET_STATIC_ROOT) {
-
-        $PROPHET_STATIC_ROOT = File::Spec->catdir(
-            Prophet::Util->updir( $INC{'Prophet.pm'}, 2 ), "share",
-            "web", "static"
-        );
-
-        eval { require File::ShareDir; 1 }
-          or die "requires File::ShareDir to determine default static root";
-
-        $PROPHET_STATIC_ROOT =
-          Prophet::Util->catfile( File::ShareDir::dist_dir('Prophet'),
-            'web/static' )
-          if ( !-d $PROPHET_STATIC_ROOT );
-
-        $PROPHET_STATIC_ROOT = Cwd::abs_path($PROPHET_STATIC_ROOT);
-
-    }
-
-    return $PROPHET_STATIC_ROOT;
-}
-
-our $APP_STATIC_ROOT;
-
-sub app_static_root {
-    my $self = shift;
-    unless ($APP_STATIC_ROOT) {
-
-        my $app_file = ref( $self->app_handle ) . ".pm";
-        $app_file =~ s|::|/|g;
-
-        $APP_STATIC_ROOT = File::Spec->catdir(
-            Prophet::Util->updir( $INC{$app_file}, 3 ), "share",
-            "web", "static"
-        );
-
-        my $dist = ref( $self->app_handle );
-        $dist =~ s/::/-/g;
-
-        eval { require File::ShareDir; 1 }
-          or die "requires File::ShareDir to determine default static root";
-
-        $APP_STATIC_ROOT =
-          Prophet::Util->catfile( File::ShareDir::dist_dir($dist),
-            'web', 'static' )
-          if ( !-d $APP_STATIC_ROOT );
-
-        $APP_STATIC_ROOT = Cwd::abs_path($APP_STATIC_ROOT);
-
-    }
-    return $APP_STATIC_ROOT;
-}
-
-# Use system-installed CSS and Javascript libraries if they exist, so distros
-# have the option to not ship our embedded copies.
-#
-# I'm not sure if RPM-based systems have a standard location for system
-# Javascript libraries, but this ought to work on Debian/Ubuntu. Patches
-# welcome.
-sub system_js_and_css {
-    my $mapping = {
-        'yui/css/reset.css' =>
-          '/usr/share/javascript/yui3/cssreset/reset-min.css',
-        'jquery/js/jquery-1.2.6.min.js',
-        => '/usr/share/javascript/jquery/jquery.min.js',
-        'jquery/js/jquery.tablesorter.min.js',
-        => '/usr/share/javascript/jquery-tablesorter/jquery.tablesorter.min.js',
-        'jquery/css/tablesorter/style.css',
-        => '/usr/share/javascript/jquery-tablesorter/themes/blue/style.css',
-    };
-    return $mapping;
-}
-
-sub css {
-    return
-      '/static/prophet/yui/css/reset.css',
-      '/static/prophet/jquery/css/superfish.css',
-      '/static/prophet/jquery/css/superfish-navbar.css',
-      '/static/prophet/jquery/css/jquery.autocomplete.css',
-      '/static/prophet/jquery/css/tablesorter/style.css',
-
-}
-
-sub js {
-    return
-      '/static/prophet/jquery/js/jquery-1.2.6.min.js',
-      '/static/prophet/jquery/js/pretty.js',
-      '/static/prophet/jquery/js/hoverIntent.js',
-      '/static/prophet/jquery/js/jquery.bgiframe.min.js',
-      '/static/prophet/jquery/js/jquery-autocomplete.js',
-      '/static/prophet/jquery/js/superfish.js',
-      '/static/prophet/jquery/js/supersubs.js',
-      '/static/prophet/jquery/js/jquery.tablesorter.min.js';
-}
-
 sub handle_request {
-    my ( $self, $cgi ) =
-      validate_pos( @_, { isa => 'Prophet::Server' }, { isa => 'CGI' } );
-    $self->cgi($cgi);
-    $self->log_request();
-    $self->page_nav(
-        Prophet::Web::Menu->new( cgi => $self->cgi, server => $self ) );
-    $self->result( Prophet::Web::Result->new() );
-    if ( $ENV{'PROPHET_DEVEL'} ) {
-        require Module::Refresh;
-        Module::Refresh->refresh();
-    }
+    my ( $self, $req ) = @_;
 
-    my $controller = Prophet::Server::Controller->new(
-        cgi        => $self->cgi,
-        app_handle => $self->app_handle,
-        result     => $self->result
-    );
-    $controller->handle_functions();
+    # my $controller = Prophet::Server::Controller->new(
+    #     cgi        => $self->cgi,
+    #     app_handle => $self->app_handle,
+    #     result     => $self->result
+    # );
+    # $controller->handle_functions();
 
-    my $dispatcher_class = ref( $self->app_handle ) . "::Server::Dispatcher";
-    if ( !$self->app_handle->try_to_require($dispatcher_class) ) {
-        $dispatcher_class = "Prophet::Server::Dispatcher";
-    }
+    # my $dispatcher_class = ref( $self->app_handle ) . "::Server::Dispatcher";
+    # if ( !$self->app_handle->try_to_require($dispatcher_class) ) {
+    #     $dispatcher_class = "Prophet::Server::Dispatcher";
+    # }
 
-    my $d = $dispatcher_class->new( server => $self );
+    # my $d = $dispatcher_class->new( server => $self );
 
-    my $path = Path::Dispatcher::Path->new(
-        path     => $cgi->path_info,
-        metadata => { method => $cgi->request_method, },
-    );
+    # my $path = Path::Dispatcher::Path->new(
+    #     path     => $cgi->path_info,
+    #     metadata => { method => $cgi->request_method, },
+    # );
 
-    $d->run( $path, $d )
-      || $self->_send_404;
+    # $d->run( $path, $d )
+    #   || $self->_send_404;
 
-}
-
-sub log_request {
-    my $self = shift;
-    my $cgi  = $self->cgi;
-    $self->app_handle->log_debug(
-            localtime() . " ["
-          . $ENV{'REMOTE_ADDR'} . "] "
-          . $cgi->request_method . " "
-          . $cgi->path_info );
 }
 
 sub update_record_prop {
@@ -355,33 +231,6 @@ sub send_replica_content {
 
 }
 
-sub show_template {
-    my $self    = shift;
-    my $p       = shift;
-    my $content = $self->render_template( $p, @_ );
-    if ($content) {
-        return $self->send_content(
-            content_type => 'text/html; charset=UTF-8',
-            content      => $content,
-        );
-    }
-    return;
-}
-
-sub render_template {
-    my $self = shift;
-    my $p    = shift;
-    if ( Template::Declare->has_template($p) ) {
-        $self->view_class->app_handle( $self->app_handle );
-        $self->view_class->cgi( $self->cgi );
-        $self->view_class->page_nav( $self->page_nav );
-        $self->view_class->server($self);
-        my $content = Template::Declare->show( $p, @_ );
-        return $content;
-    }
-    return;
-}
-
 sub load_record {
     my $self = shift;
     my %args = validate( @_, { type => 1, uuid => 0 } );
@@ -399,47 +248,6 @@ sub load_record {
         $record->load( uuid => $args{uuid} );
     }
     return $record;
-}
-
-sub send_static_file {
-    my $self     = shift;
-    my $filename = shift;
-    my $type     = 'text/html';
-
-    if ( $filename =~ /.js$/ ) {
-        $type = 'text/javascript';
-    } elsif ( $filename =~ /.css$/ ) {
-        $type = 'text/css';
-    } elsif ( $filename =~ /.png$/ ) {
-        $type = 'image/png';
-    }
-
-    my $system_library_mapping = $self->system_js_and_css();
-    my $content;
-    if ( $system_library_mapping->{$filename}
-        && -f $system_library_mapping->{$filename} )
-    {
-        $content =
-          Prophet::Util->slurp( $system_library_mapping->{$filename} );
-    } else {
-        for my $root ( $self->app_static_root, $self->prophet_static_root ) {
-            next unless -f Prophet::Util->catfile( $root => $filename );
-            my $qualified_file =
-              Cwd::fast_abs_path( File::Spec->catfile( $root => $filename ) );
-            next if substr( $qualified_file, 0, length($root) ) ne $root;
-            $content = Prophet::Util->slurp($qualified_file);
-        }
-    }
-
-    if ( defined $content ) {
-        return $self->send_content(
-            static       => 1,
-            content      => $content,
-            content_type => $type
-        );
-    } else {
-        return $self->_send_404;
-    }
 }
 
 sub send_content {
@@ -484,19 +292,6 @@ sub _send_redirect {
     print "HTTP/1.0 302 Go over there\r\n";
     print "Location: " . $args{'to'} . "\r\n";
     return '302';
-}
-
-=method make_link_relative PATH
-
-This method does its best to convert a URI path from absolute ( starts at / )
-to relative. (Starts at .).
-
-=cut
-
-sub make_link_relative {
-    my $self = shift;
-    my $link = shift;
-    return URI::file->new($link)->rel( "file://" . $self->cgi->path_info() );
 }
 
 1;
