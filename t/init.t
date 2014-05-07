@@ -2,8 +2,6 @@ use Prophet::Test::Syntax;
 
 with 'Prophet::Test';
 
-before setup => sub { $_[0]->as_alice };
-
 test 'init repo' => sub {
     my $self = shift;
 

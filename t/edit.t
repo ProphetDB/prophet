@@ -6,11 +6,11 @@ use Prophet::Record;
 test 'edit record' => sub {
     my $self = shift;
 
-    my $uuid = $self->create_record('Robot Master');
+    my $record = $self->create_record('Robot Master');
 
     $self->update_record(
         'Robot Master',
-        $uuid,
+        $record->uuid,
         {
             name     => 'Shadow Man',
             weapon   => 'Shadow Blade',
@@ -19,8 +19,8 @@ test 'edit record' => sub {
         },
     );
 
-    my $shadow_man = $self->load_record( 'Robot Master', $uuid );
-    is $shadow_man->uuid, $uuid, 'correct uuid';
+    my $shadow_man = $self->load_record( 'Robot Master', $record->uuid );
+    is $shadow_man->uuid, $record->uuid, 'correct uuid';
     is $shadow_man->prop('name'),     'Shadow Man',   'correct name';
     is $shadow_man->prop('weapon'),   'Shadow Blade', 'correct weapon';
     is $shadow_man->prop('weakness'), 'Top Spin',     'correct weakness';
