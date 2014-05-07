@@ -104,7 +104,7 @@ sub create_record {
       new_ok 'Prophet::Record' => [ handle => $self->cxn, type => $type ];
 
     ok my $uuid = $record->create( props => $props ), 'created a record';
-    return $uuid;
+    return $record;
 }
 
 =method load_record(Str $type, Str $uuid)
@@ -299,10 +299,9 @@ Runs CODE as alice, bob, charlie or david.
 
 =cut
 
-sub as_alice   { $_[0]->as_user('alice') }
-sub as_bob     { $_[0]->as_user('bob') }
-sub as_charlie { as_user( charlie => shift ) }
-sub as_david   { as_user( david => shift ) }
+# sub as_alice   { $_[0]->as_user('alice') }
+# sub as_bob     { $_[0]->as_user('bob') }
+# sub as_charlie { as_user( charlie => shift ) }
 
 # END {
 #     for (qw(alice bob charlie david)) {
